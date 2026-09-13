@@ -1,0 +1,1592 @@
+# Actionability gold set for the JedAI portal KB pilot.
+#
+# THE TEST (the user's principle, verbatim):
+#   "Memory is a shortcut for the agent's next action."
+#   For every candidate fact, ask: WHAT STEP DOES KNOWING THIS LET THE AGENT SKIP?
+#
+#   Qualifies:     "you're already authenticated to gh CLI via X, so just use it"
+#                  "Special Offers content lives at <path>, go straight there"
+#   Does not:      a field inventory -- the agent must open the schema anyway, and
+#                  a renamed field makes the memory ACTIVELY MISLEADING.
+#   Exception:     a field DOES qualify when it controls behaviour, e.g. "the
+#                  `authorship` frontmatter gates whether content is human-certified".
+#
+# WHAT THIS FILE IS
+# -----------------
+# The reference answer against which `ingest/score_actionability.py` judges a
+# graph. It replaces "does the graph look reasonable" with a number.
+#
+# Every entry below was authored by READING the portal MDX at the commit named in
+# `meta.portal_commit`. Nothing here is a plausible-sounding invention: each entry
+# carries `file` + `line` + a `quote` that is an EXACT SUBSTRING of that line, and
+# `score_actionability.py --verify-citations` re-checks all of them against the
+# portal working tree. If a citation drifts, the harness fails loudly rather than
+# scoring against fiction.
+#
+# BANDS
+#   must_remember      -- a gate that drops these has broken the memory
+#   must_not_remember  -- a gate that keeps these has filled memory with noise
+#   edge_cases         -- the genuinely arguable ones; `expected` records the call
+#                         and `reasoning` records why. These are where a gate is
+#                         worth judging, and they are scored SEPARATELY so they can
+#                         never quietly inflate the headline number.
+#
+# This is an ABSOLUTE standard, not a relative one. A graph is judged on its own
+# terms: did it store what should be stored, and did it keep out what should not.
+#
+# MATCH CONTRACT (consumed by score_actionability.py)
+#   subject_any        -- OR over phrases; a phrase matches when ALL its normalized
+#                         tokens are present in the candidate's token set
+#   predicate_any      -- OR over phrases, same containment rule
+#   object_all         -- AND: every phrase must be contained
+#   object_any_groups  -- OR over groups; a group matches when ALL its phrases are
+#                         contained (use for genuinely alternative phrasings)
+#   Any field may be omitted, in which case it imposes no constraint.
+#   The scorer additionally reports whether the match aligned with the candidate's
+#   actual subject/predicate/object fields ("structural") or only with the flat
+#   fact string ("lexical"); see the README.
+
+meta:
+  version: 1
+  authored_at: "2026-08-12"
+  authored_from: "direct reading of the portal MDX -- no fact is inferred from the graph"
+  portal_repo: "/Users/logan.robbins/jedai/portal"
+  portal_commit: "d1b1061"
+  portal_content_root: "src/content/docs"
+  principle: "Memory is a shortcut for the agent's next action. The test is: what step does knowing this let the agent skip?"
+  # The subtrees the gold set was authored from. Every entry cites a file under one
+  # of these, relative to `portal_content_root`.
+  pilot_subtrees:
+    - "products/jedai-gateway/"
+    - "platform/knowledgebase/"
+    - "solution_engineering/platform-decision-log/"
+
+# =====================================================================
+# MUST REMEMBER -- every one of these lets an agent skip a real step
+# =====================================================================
+must_remember:
+
+  # --- environment topology: the facts an operator spent an hour rediscovering ---
+  - id: MR-01
+    kind: endpoint
+    statement: "The Integration (preview) gateway API endpoint is https://preview.jedai-gateway.wdprapps.disney.com"
+    saves: "skip probing hosts to find which URL serves non-production traffic"
+    slug: "/products/jedai-gateway/#environments"
+    file: "products/jedai-gateway/index.mdx"
+    line: 304
+    quote: "`https://preview.jedai-gateway.wdprapps.disney.com`"
+    match:
+      subject_any: ["integration", "preview"]
+      predicate_any: ["endpoint", "base url", "api", "host"]
+      object_all: ["https://preview.jedai-gateway.wdprapps.disney.com"]
+
+  - id: MR-02
+    kind: endpoint
+    statement: "The Production gateway API endpoint is https://jedai-gateway.wdprapps.disney.com"
+    saves: "skip probing hosts to find which URL serves production traffic"
+    slug: "/products/jedai-gateway/#environments"
+    file: "products/jedai-gateway/index.mdx"
+    line: 305
+    quote: "`https://jedai-gateway.wdprapps.disney.com`"
+    match:
+      subject_any: ["production"]
+      predicate_any: ["endpoint", "base url", "api", "host"]
+      object_all: ["https://jedai-gateway.wdprapps.disney.com"]
+
+  - id: MR-03
+    kind: endpoint
+    statement: "The Integration Admin UI is https://preview.jedai-gateway-admin.wdprapps.disney.com/ui"
+    saves: "skip hunting for where to mint a non-production virtual key"
+    slug: "/products/jedai-gateway/#environments"
+    file: "products/jedai-gateway/index.mdx"
+    line: 304
+    quote: "`https://preview.jedai-gateway-admin.wdprapps.disney.com/ui`"
+    match:
+      subject_any: ["integration", "preview"]
+      predicate_any: ["admin", "ui", "console"]
+      object_all: ["https://preview.jedai-gateway-admin.wdprapps.disney.com/ui"]
+
+  - id: MR-04
+    kind: endpoint
+    statement: "The Production Admin UI is https://jedai-gateway-admin.wdprapps.disney.com/ui"
+    saves: "skip hunting for where to mint a production virtual key"
+    slug: "/products/jedai-gateway/#environments"
+    file: "products/jedai-gateway/index.mdx"
+    line: 305
+    quote: "`https://jedai-gateway-admin.wdprapps.disney.com/ui`"
+    match:
+      subject_any: ["production"]
+      predicate_any: ["admin", "ui", "console"]
+      object_all: ["https://jedai-gateway-admin.wdprapps.disney.com/ui"]
+
+  - id: MR-05
+    kind: gotcha
+    statement: "Native MCP connections resolve against the Admin UI host, NOT the API endpoint host"
+    saves: "skip an entire failed-connection debugging loop against the wrong host"
+    slug: "/products/jedai-gateway/#environments"
+    file: "products/jedai-gateway/index.mdx"
+    line: 308
+    quote: "Native MCP connections resolve against the **Admin UI** host"
+    match:
+      subject_any: ["mcp"]
+      predicate_any: ["resolve", "resolves", "connect", "connections", "requires", "host"]
+      object_all: ["admin", "host"]
+
+  # --- key format and key types per environment ---
+  - id: MR-06
+    kind: key_policy
+    statement: "Production permits only Service Account and Agent virtual key types"
+    saves: "skip attempting a Personal key in Production and waiting for the refusal"
+    slug: "/products/jedai-gateway/#the-hierarchy-how-access-and-budget-flow"
+    file: "products/jedai-gateway/index.mdx"
+    line: 280
+    quote: "| **Production** | Service Account, Agent |"
+    match:
+      subject_any: ["production"]
+      predicate_any: ["key", "keys", "restricts", "requires", "permits", "allowed"]
+      object_all: ["service", "account", "agent"]
+
+  - id: MR-07
+    kind: key_policy
+    statement: "Integration permits Service Account, Agent, and Personal (team member) virtual key types"
+    saves: "skip asking a Team Admin whether a personal dev key is allowed"
+    slug: "/products/jedai-gateway/#the-hierarchy-how-access-and-budget-flow"
+    file: "products/jedai-gateway/index.mdx"
+    line: 281
+    quote: "| **Integration** | Service Account, Agent, Personal (team member) |"
+    match:
+      subject_any: ["integration"]
+      predicate_any: ["key", "keys", "requires", "permits", "allowed"]
+      object_all: ["service", "account", "agent", "personal"]
+
+  - id: MR-08
+    kind: key_policy
+    statement: "Personal (team member) keys must not be used in Production workloads"
+    saves: "skip shipping a workload on a key that will be revoked as a policy breach"
+    slug: "/products/jedai-gateway/#the-hierarchy-how-access-and-budget-flow"
+    file: "products/jedai-gateway/index.mdx"
+    line: 283
+    quote: "must not be used in Production workloads"
+    match:
+      subject_any: ["personal"]
+      predicate_any: ["must", "not", "requires", "prohibited", "restricts"]
+      object_all: ["production"]
+
+  - id: MR-09
+    kind: key_policy
+    statement: "One `sk-...` virtual key authenticates every model and every endpoint on the gateway"
+    saves: "skip provisioning or refreshing a separate per-provider credential"
+    slug: "/products/jedai-gateway/#coming-from-v1-heres-why-you-should-migrate"
+    file: "products/jedai-gateway/index.mdx"
+    line: 56
+    quote: "One `sk-...` virtual key for every model"
+    match:
+      subject_any: ["gateway", "virtual key", "key"]
+      predicate_any: ["requires", "authenticates", "uses", "exposes", "scopes", "is"]
+      object_any_groups:
+        - ["virtual", "key", "all models"]
+        - ["one virtual api key"]
+        - ["single virtual api key"]
+        - ["sk-"]
+
+  - id: MR-10
+    kind: key_policy
+    statement: "The full virtual key value is displayed exactly once at creation; afterwards only the last 4 characters are visible"
+    saves: "skip an unrecoverable key loss -- capture the value before closing the dialog"
+    slug: "/products/jedai-gateway/onboarding/#step-5-create-your-first-virtual-key"
+    file: "products/jedai-gateway/onboarding.mdx"
+    line: 149
+    quote: "the **full key value is displayed exactly once**"
+    match:
+      subject_any: ["key", "virtual key"]
+      predicate_any: ["displayed", "shown", "visible", "displays"]
+      object_any_groups:
+        - ["once"]
+        - ["last 4"]
+
+  - id: MR-11
+    kind: procedure
+    statement: "Key Access Type must be set to `AI APIs` when creating a virtual key"
+    saves: "skip creating a key that cannot call the model endpoints and re-doing it"
+    slug: "/products/jedai-gateway/onboarding/#key-configuration"
+    file: "products/jedai-gateway/onboarding.mdx"
+    line: 137
+    quote: "| **Key Access Type** | Set to `AI APIs` |"
+    match:
+      subject_any: ["key access type", "key"]
+      predicate_any: ["set", "requires", "must", "is"]
+      object_all: ["ai", "apis"]
+
+  - id: MR-12
+    kind: convention
+    statement: "Virtual key names follow usr_/svc_/agent_<usecase#>_<descriptor> by key type, where <usecase#> is the number in the DX team name"
+    saves: "skip inventing a name that breaks cost attribution and has to be re-created"
+    slug: "/products/jedai-gateway/onboarding/#key-naming-conventions"
+    file: "products/jedai-gateway/onboarding.mdx"
+    line: 168
+    quote: "`svc_<usecase#>_<key descriptor>`"
+    match:
+      subject_any: ["key", "service account", "naming"]
+      predicate_any: ["naming", "name", "pattern", "convention", "follows"]
+      object_any_groups:
+        - ["svc_"]
+        - ["usr_"]
+        - ["agent_"]
+
+  - id: MR-13
+    kind: convention
+    statement: "Teams are named DX<#>-<Use Case Name>, e.g. DX0021-AI Powered Search"
+    saves: "skip searching the Admin UI for which team a use case maps to"
+    slug: "/products/jedai-gateway/onboarding/#step-1-jedai-team-provisions-your-team"
+    file: "products/jedai-gateway/onboarding.mdx"
+    line: 55
+    quote: "DX<#>-<Use Case Name>"
+    match:
+      subject_any: ["team"]
+      predicate_any: ["naming", "name", "convention", "follows", "uses"]
+      object_any_groups:
+        - ["dx"]
+
+  # --- budget / limit thresholds ---
+  - id: MR-14
+    kind: threshold
+    statement: "Team budget is a $500 hard cap with a $250 soft-budget email alert; budget is enforced at the TEAM level, not per key"
+    saves: "skip asking what the spend ceiling is before sizing a workload"
+    slug: "/products/jedai-gateway/#key-value-props"
+    file: "products/jedai-gateway/index.mdx"
+    line: 153
+    quote: "$500 hard cap, $250 soft budget alert"
+    match:
+      subject_any: ["team", "gateway", "budget"]
+      predicate_any: ["budget", "cap", "limit", "enforces", "governed"]
+      object_any_groups:
+        - ["$500"]
+        - ["500"]
+
+  - id: MR-15
+    kind: threshold
+    statement: "The $250 soft budget triggers an advisory email; requests continue. Only the hard budget blocks requests."
+    saves: "skip treating a soft-budget alert as an outage"
+    slug: "/products/jedai-gateway/#key-value-props"
+    file: "products/jedai-gateway/index.mdx"
+    line: 153
+    quote: "$250 soft budget alert"
+    match:
+      subject_any: ["budget", "soft budget", "gateway", "team"]
+      predicate_any: ["alert", "notification", "sends", "crossed", "soft"]
+      object_any_groups:
+        - ["$250"]
+        - ["250"]
+
+  - id: MR-16
+    kind: threshold
+    statement: "Budgets are perpetual with no automatic reset; a reset or increase requires contacting DX.JEDAI@disney.com"
+    saves: "skip waiting for a monthly rollover that never happens"
+    slug: "/products/jedai-gateway/onboarding/#key-configuration"
+    file: "products/jedai-gateway/onboarding.mdx"
+    line: 140
+    quote: "Budgets are perpetual — no automatic reset."
+    match:
+      subject_any: ["budget", "budgets"]
+      predicate_any: ["perpetual", "reset", "duration", "is", "are"]
+      object_any_groups:
+        - ["perpetual"]
+        - ["no automatic reset"]
+        - ["dx.jedai@disney.com"]
+
+  # --- model alias convention ---
+  - id: MR-17
+    kind: convention
+    statement: "Gateway model aliases are exact, UNDATED strings with no fuzzy matching -- `claude-haiku-4-5` resolves, `claude-haiku-4-5-20251001` does not; a provider-style dated snapshot id is not a registered alias"
+    saves: "skip a 404 ModelNotFoundError caused by appending a provider date suffix to an alias"
+    slug: "/products/jedai-gateway/troubleshooting/#5-404-modelnotfounderror"
+    file: "products/jedai-gateway/troubleshooting.mdx"
+    line: 228
+    quote: "Model aliases are exact strings — no fuzzy matching"
+    match:
+      subject_any: ["model", "alias", "aliases"]
+      predicate_any: ["are", "is", "requires", "must", "match", "exact"]
+      object_any_groups:
+        - ["exact"]
+        - ["no fuzzy matching"]
+        - ["undated"]
+        - ["claude-haiku-4-5"]
+        - ["claude-sonnet-4-5"]
+
+  - id: MR-18
+    kind: procedure
+    statement: "The authoritative list of model aliases available to a key is GET /v1/models -- do not guess an alias"
+    saves: "skip guessing model names; one call returns the exact registered set"
+    slug: "/products/jedai-gateway/troubleshooting/#5-404-modelnotfounderror"
+    file: "products/jedai-gateway/troubleshooting.mdx"
+    line: 240
+    quote: "Use the exact model alias returned by `GET /v1/models`"
+    match:
+      subject_any: ["model", "models", "alias", "aliases", "key"]
+      predicate_any: ["returned", "list", "get", "returns", "lists"]
+      object_any_groups:
+        - ["/v1/models"]
+        - ["v1/models"]
+
+  - id: MR-19
+    kind: gotcha
+    statement: "The gateway runs with drop_params: true -- unsupported parameters are silently removed instead of returning a 400"
+    saves: "skip debugging why a parameter appeared to be accepted but had no effect"
+    slug: "/products/jedai-gateway/api-integration-guide/#reasoning-and-codex-models"
+    file: "products/jedai-gateway/api-integration-guide.mdx"
+    line: 488
+    quote: "Unsupported parameters (e.g. `temperature: 0.7` on o3) are **silently removed**"
+    match:
+      subject_any: ["gateway", "drop_params", "parameters", "params"]
+      predicate_any: ["runs", "drops", "removed", "dropped", "is", "silently"]
+      object_any_groups:
+        - ["drop_params"]
+        - ["silently", "removed"]
+        - ["dropped", "silently"]
+
+  - id: MR-20
+    kind: gotcha
+    statement: "Reasoning models accept only temperature=1; the Responses API budget parameter is max_output_tokens, not max_completion_tokens"
+    saves: "skip a failed or truncated reasoning call caused by the wrong parameter name"
+    slug: "/products/jedai-gateway/api-integration-guide/#token-budget"
+    file: "products/jedai-gateway/api-integration-guide.mdx"
+    line: 556
+    quote: "Use this name — not `max_completion_tokens`"
+    match:
+      subject_any: ["responses", "reasoning", "responses api", "model"]
+      predicate_any: ["use", "uses", "requires", "parameter", "budget", "accepts"]
+      object_any_groups:
+        - ["max_output_tokens"]
+        - ["temperature", "1"]
+
+  # --- ownership / routing: "X is authoritative for Y, go there" ---
+  - id: MR-21
+    kind: ownership
+    statement: "D-Scribe is maintained by the GCX (Guest Content eXperience) team, and GCX provides the Special Offers feed"
+    saves: "skip tracing a content question through the wrong team -- go straight to GCX"
+    slug: "/platform/knowledgebase/sources/dscribe/"
+    file: "platform/knowledgebase/sources/dscribe/index.mdx"
+    line: 8
+    quote: "maintained and managed by the [GCX (Guest Content eXperience)]"
+    match:
+      subject_any: ["d-scribe", "dscribe", "special offers", "gcx"]
+      predicate_any: ["maintained", "managed", "provided", "sourced", "owns", "is", "from"]
+      object_any_groups:
+        - ["gcx"]
+        - ["guest content experience"]
+
+  - id: MR-22
+    kind: routing
+    statement: "Special Offers content lives at the D-Scribe path /content/preview/{locale}/{slug}/MarketingOffers/"
+    saves: "skip crawling D-Scribe to locate where Special Offers content is published"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 23
+    quote: "`/content/preview/{locale}/{slug}/MarketingOffers/`"
+    match:
+      subject_any: ["special offers"]
+      predicate_any: ["path", "lives", "located", "d-scribe path", "has"]
+      object_any_groups:
+        - ["marketingoffers"]
+        - ["/content/preview/{locale}/{slug}/marketingoffers/"]
+
+  - id: MR-23
+    kind: routing
+    statement: "Walt Disney World Special Offers are backed by Vertex data store kb_ds_source_dscribe_special_offers_wdw_en_us_v1"
+    saves: "skip enumerating Vertex data stores to find the WDW offers corpus"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 33
+    quote: "kb_ds_source_dscribe_special_offers_wdw_en_us_v1"
+    match:
+      subject_any: ["special offers", "kb_ds_source_dscribe_special_offers_wdw_en_us_v1", "walt disney world"]
+      predicate_any: ["data store", "backing", "backs", "is", "vertex"]
+      object_all: ["kb_ds_source_dscribe_special_offers_wdw_en_us_v1"]
+
+  - id: MR-24
+    kind: routing
+    statement: "Disneyland Resort Special Offers are backed by Vertex data store kb_ds_source_dscribe_special_offers_dlr_en_us_v1"
+    saves: "skip enumerating Vertex data stores to find the DLR offers corpus"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 34
+    quote: "kb_ds_source_dscribe_special_offers_dlr_en_us_v1"
+    match:
+      subject_any: ["special offers", "kb_ds_source_dscribe_special_offers_dlr_en_us_v1", "disneyland resort"]
+      predicate_any: ["data store", "backing", "backs", "is", "vertex"]
+      object_all: ["kb_ds_source_dscribe_special_offers_dlr_en_us_v1"]
+
+  - id: MR-25
+    kind: routing
+    statement: "Aulani Special Offers are backed by Vertex data store kb_ds_source_dscribe_special_offers_aulani_en_us_v1"
+    saves: "skip enumerating Vertex data stores to find the Aulani offers corpus"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 35
+    quote: "kb_ds_source_dscribe_special_offers_aulani_en_us_v1"
+    match:
+      subject_any: ["special offers", "kb_ds_source_dscribe_special_offers_aulani_en_us_v1", "aulani"]
+      predicate_any: ["data store", "backing", "backs", "is", "vertex"]
+      object_all: ["kb_ds_source_dscribe_special_offers_aulani_en_us_v1"]
+
+  - id: MR-26
+    kind: routing
+    statement: "planDisney Pocket Guides for Walt Disney World are backed by Vertex data store kb_ds_source_plandisney_pocket_guides_wdw_en_us_v1"
+    saves: "skip enumerating Vertex data stores to find the WDW pocket-guide corpus"
+    slug: "/platform/knowledgebase/sources/plandisney/pocket-guides/#supported-brandslocales"
+    file: "platform/knowledgebase/sources/plandisney/pocket-guides.mdx"
+    line: 23
+    quote: "kb_ds_source_plandisney_pocket_guides_wdw_en_us_v1"
+    match:
+      subject_any: ["pocket guides", "kb_ds_source_plandisney_pocket_guides_wdw_en_us_v1", "walt disney world"]
+      predicate_any: ["data store", "backing", "backs", "is", "vertex"]
+      object_all: ["kb_ds_source_plandisney_pocket_guides_wdw_en_us_v1"]
+
+  - id: MR-27
+    kind: routing
+    statement: "planDisney Pocket Guides for Disneyland Resort are backed by Vertex data store kb_ds_source_plandisney_pocket_guides_dlr_en_us_v1"
+    saves: "skip enumerating Vertex data stores to find the DLR pocket-guide corpus"
+    slug: "/platform/knowledgebase/sources/plandisney/pocket-guides/#supported-brandslocales"
+    file: "platform/knowledgebase/sources/plandisney/pocket-guides.mdx"
+    line: 24
+    quote: "kb_ds_source_plandisney_pocket_guides_dlr_en_us_v1"
+    match:
+      subject_any: ["pocket guides", "kb_ds_source_plandisney_pocket_guides_dlr_en_us_v1", "disneyland resort"]
+      predicate_any: ["data store", "backing", "backs", "is", "vertex"]
+      object_all: ["kb_ds_source_plandisney_pocket_guides_dlr_en_us_v1"]
+
+  - id: MR-28
+    kind: gotcha
+    statement: "Not all Special Offers include a file_url in their metadata; consumers must handle the missing URL"
+    saves: "skip a null-dereference crash on offers with no canonical URL"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 9
+    quote: "Not all Special Offers include a `file_url` in their metadata"
+    match:
+      subject_any: ["special offers", "consumers", "file_url"]
+      predicate_any: ["handle", "requires", "must", "include", "missing"]
+      object_all: ["file_url"]
+
+  - id: MR-29
+    kind: contract
+    statement: "The Special Offers feed is Markdown with JSON Metadata, delivered event-driven (no polling schedule)"
+    saves: "skip inspecting a sample payload to learn the format, and skip waiting on a cron that does not exist"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 21
+    quote: "**Feed format**: Markdown with JSON Metadata"
+    match:
+      subject_any: ["special offers", "feed"]
+      predicate_any: ["format", "state", "has", "is", "delivers"]
+      object_all: ["markdown", "json"]
+
+  # --- governed procedures ---
+  - id: MR-30
+    kind: procedure
+    statement: "All use cases require Office of Technology Enablement (OTE) AI clearance before accessing production"
+    saves: "skip planning a production launch that will be blocked at the clearance gate"
+    slug: "/products/jedai-gateway/#from-idea-to-production-the-use-case-journey"
+    file: "products/jedai-gateway/index.mdx"
+    line: 194
+    quote: "AI clearance before accessing production"
+    match:
+      subject_any: ["use case", "production", "ote", "office of technology enablement"]
+      predicate_any: ["requires", "require", "must", "needs"]
+      object_any_groups:
+        - ["office of technology enablement", "clearance"]
+        - ["ote", "clearance"]
+
+  - id: MR-31
+    kind: procedure
+    statement: "Production readiness requires Jedai Council review, GIS security scan, ARB validation, token calculations, and performance testing -- all must pass"
+    saves: "skip discovering the production checklist item-by-item as each one blocks you"
+    slug: "/products/jedai-gateway/#from-idea-to-production-the-use-case-journey"
+    file: "products/jedai-gateway/index.mdx"
+    line: 196
+    quote: "Jedai Council review, GIS security scan, ARB validation, token calculations, and performance testing must all pass"
+    match:
+      subject_any: ["production", "use case", "production readiness"]
+      predicate_any: ["requires", "require", "must", "pass"]
+      object_all: ["council", "gis", "arb"]
+
+  - id: MR-32
+    kind: procedure
+    statement: "Production key creation is locked until the commercialization checklist clears; Integration keys are available as soon as the use case is approved"
+    saves: "skip trying to create a production key before the gate opens"
+    slug: "/products/jedai-gateway/governance/#virtual-keys"
+    file: "products/jedai-gateway/governance.mdx"
+    line: 94
+    quote: "Production key creation is locked until the commercialization checklist clears"
+    match:
+      subject_any: ["production", "key", "keys"]
+      predicate_any: ["locked", "gated", "requires", "blocked", "until"]
+      object_any_groups:
+        - ["commercialization"]
+
+  - id: MR-33
+    kind: procedure
+    statement: "Every team member must complete their own SSO login before a Team Admin can add them to the team; a user cannot create a virtual key until assigned to a team"
+    saves: "skip a failed add-member attempt for someone who has never logged in"
+    slug: "/products/jedai-gateway/onboarding/#step-2-activate-your-account-sso-login"
+    file: "products/jedai-gateway/onboarding.mdx"
+    line: 77
+    quote: "Every team member must complete this login step individually before the Intake Team can assign them to the team"
+    match:
+      subject_any: ["team member", "member", "user", "users"]
+      predicate_any: ["must", "requires", "cannot", "before"]
+      object_any_groups:
+        - ["sso", "login"]
+        - ["login", "individually"]
+        - ["assigned", "team"]
+
+  - id: MR-34
+    kind: gotcha
+    statement: "Removing a user from a team does NOT revoke their keys -- revocation is a separate step"
+    saves: "skip leaving a live credential behind after offboarding"
+    slug: "/products/jedai-gateway/governance/#cost-attribution"
+    file: "products/jedai-gateway/governance.mdx"
+    line: 124
+    quote: "Removing a user from the team does not automatically revoke their keys"
+    match:
+      subject_any: ["offboarding", "user", "team", "keys", "removal"]
+      predicate_any: ["does not", "not", "revoke", "requires", "separate"]
+      object_all: ["revoke"]
+
+  - id: MR-35
+    kind: routing
+    statement: "Escalate persistent 500s (>5 min) to the Jedai Proxy Admin, and an unregistered model to Jedai Master via the Org Admin; always include x-litellm-call-id"
+    saves: "skip routing an incident to the wrong owner"
+    slug: "/products/jedai-gateway/troubleshooting/#escalation-paths"
+    file: "products/jedai-gateway/troubleshooting.mdx"
+    line: 384
+    quote: "| Persistent 500 errors (> 5 min) | Jedai Proxy Admin |"
+    match:
+      subject_any: ["500", "escalation", "error", "errors", "model"]
+      predicate_any: ["escalate", "escalated", "resolved", "contact", "to"]
+      object_any_groups:
+        - ["jedai proxy admin"]
+        - ["jedai master"]
+
+  # --- platform decisions (the decision log) ---
+  - id: MR-36
+    kind: decision
+    statement: "D002: the integration environment is treated as production by Jedai and mirrors production infrastructure"
+    saves: "skip treating integration as a throwaway sandbox and skip re-asking whether change control applies"
+    slug: "/solution_engineering/platform-decision-log/approved/#d002-standard-platform-environments"
+    file: "solution_engineering/platform-decision-log/approved.mdx"
+    line: 68
+    quote: "(treated as production by Jedai)"
+    match:
+      subject_any: ["integration"]
+      predicate_any: ["treated", "is", "mirrors", "environment"]
+      object_any_groups:
+        - ["treated", "production"]
+        - ["mirrors production"]
+
+  - id: MR-37
+    kind: decision
+    statement: "D002: promoting to production requires Director Go/No-Go, CAB approval, post-deploy smoketests, and hypercare"
+    saves: "skip planning a release without the approvals it will be stopped for"
+    slug: "/solution_engineering/platform-decision-log/approved/#d002-standard-platform-environments"
+    file: "solution_engineering/platform-decision-log/approved.mdx"
+    line: 69
+    quote: "Director Go/No-Go, CAB approval, post-deploy smoketests, hypercare"
+    match:
+      subject_any: ["production", "promotion", "tollgate"]
+      predicate_any: ["requires", "require", "tollgate", "approval", "must"]
+      object_all: ["cab"]
+
+  - id: MR-38
+    kind: decision
+    statement: "D001: production targets 99.99% availability and integration 99.5%, both at 6h RPO, in the NAM deployment"
+    saves: "skip re-deriving the SLO before an architecture or on-call decision"
+    slug: "/solution_engineering/platform-decision-log/approved/#d001-standard-platform-classes"
+    file: "solution_engineering/platform-decision-log/approved.mdx"
+    line: 36
+    quote: "| integration | 99.5% | 6h |"
+    match:
+      subject_any: ["integration", "production", "platform", "jedai platform"]
+      predicate_any: ["availability", "target", "state", "has", "decides"]
+      object_any_groups:
+        - ["99.5%"]
+        - ["99.5"]
+
+  - id: MR-39
+    kind: decision
+    statement: "D003: BAPP0248028 is the BAPPID for the NA Platform tier, covering all applications and environments in that tier"
+    saves: "skip hunting for the BAPPID when filing a change or a deployment"
+    slug: "/solution_engineering/platform-decision-log/approved/#d003-bappid-strategy"
+    file: "solution_engineering/platform-decision-log/approved.mdx"
+    line: 77
+    quote: "**BAPP0248028:** NA Platform"
+    match:
+      subject_any: ["bappid", "bapp0248028", "na platform", "platform"]
+      predicate_any: ["is", "provisioned", "covers", "encompasses", "has"]
+      object_all: ["bapp0248028"]
+
+  - id: MR-40
+    kind: decision
+    statement: "D005: CockroachDB is a non-starter as a PostgreSQL substitute for this platform"
+    saves: "skip re-evaluating CockroachDB from scratch"
+    slug: "/solution_engineering/platform-decision-log/approved/#d005-cockroachdb-viability-as-postgresql-substitute"
+    file: "solution_engineering/platform-decision-log/approved.mdx"
+    line: 94
+    quote: "CockroachDB is a **non-starter** for this use case"
+    match:
+      subject_any: ["cockroachdb"]
+      predicate_any: ["is", "decides", "decided", "rejected"]
+      object_any_groups:
+        - ["non-starter"]
+        - ["non starter"]
+
+  - id: MR-41
+    kind: decision
+    statement: "D006: outstanding CAR knowledge base obligations are implemented via N8N, and N8N is a core platform technology for internal tools"
+    saves: "skip re-choosing an orchestration technology for a KB workflow"
+    slug: "/solution_engineering/platform-decision-log/approved/#d006-jedai-helix-collaboration"
+    file: "solution_engineering/platform-decision-log/approved.mdx"
+    line: 110
+    quote: "Outstanding CAR knowledge base obligations shall be implemented via N8N"
+    match:
+      subject_any: ["n8n", "car", "knowledge base"]
+      predicate_any: ["implemented", "is", "shall", "decides", "uses"]
+      object_all: ["n8n"]
+
+  - id: MR-42
+    kind: decision
+    statement: "D007: the platform ships as a unified umbrella Helm chart with a single top-level values.yaml, with per-component charts as sub-chart dependencies"
+    saves: "skip reconciling values across per-component charts when standing up an environment"
+    slug: "/solution_engineering/platform-decision-log/approved/#d007-unified-jedai-platform-helm-chart"
+    file: "solution_engineering/platform-decision-log/approved.mdx"
+    line: 129
+    quote: "Publish a unified umbrella Helm chart"
+    match:
+      subject_any: ["helm", "chart", "platform"]
+      predicate_any: ["publish", "is", "decides", "shall", "exposes"]
+      object_any_groups:
+        - ["umbrella", "helm", "chart"]
+        - ["values.yaml"]
+
+  - id: MR-43
+    kind: decision
+    statement: "D008: SCIM for LiteLLM is disengaged; Jedai operations owns the user lifecycle instead"
+    saves: "skip waiting on SCIM automation that will never arrive, and skip re-scoping it"
+    slug: "/solution_engineering/platform-decision-log/approved/#d008-disengage-scim-integration-for-litellm"
+    file: "solution_engineering/platform-decision-log/approved.mdx"
+    line: 142
+    quote: "Disengage SCIM for LiteLLM; Jedai operations owns the user lifecycle in its place"
+    match:
+      subject_any: ["scim"]
+      predicate_any: ["disengage", "disengaged", "decides", "is"]
+      object_any_groups:
+        - ["litellm"]
+        - ["user lifecycle"]
+
+  - id: MR-44
+    kind: decision
+    statement: "D009: LiteLLM stores downstream credentials in PostgreSQL encrypted with a master key held in Vault -- Vault is off the runtime read/write path"
+    saves: "skip designing a Vault-on-the-hot-path integration that contradicts the standard"
+    slug: "/solution_engineering/platform-decision-log/approved/#d009-standardize-litellm-secrets-storage-on-postgresql"
+    file: "solution_engineering/platform-decision-log/approved.mdx"
+    line: 158
+    quote: "LiteLLM stores downstream credentials in PostgreSQL, encrypted with a master key held in Vault"
+    match:
+      subject_any: ["litellm", "secrets", "credentials"]
+      predicate_any: ["stores", "stored", "is", "decides", "standard"]
+      object_all: ["postgresql"]
+      object_any_groups:
+        - ["vault"]
+
+  - id: MR-45
+    kind: decision
+    statement: "D010: LiteLLM API stability standard -- new features ship behind a feature flag, and fields are neither deleted nor redefined without a version increase"
+    saves: "skip re-negotiating API compatibility expectations with the vendor"
+    slug: "/solution_engineering/platform-decision-log/approved/#d010-keep-the-litellm-api-stable"
+    file: "solution_engineering/platform-decision-log/approved.mdx"
+    line: 174
+    quote: "API fields are not deleted without a version increase"
+    match:
+      subject_any: ["litellm", "api", "fields", "features"]
+      predicate_any: ["not deleted", "requires", "ship", "stable", "are", "shall"]
+      object_any_groups:
+        - ["version increase"]
+        - ["feature flag"]
+
+  - id: MR-46
+    kind: decision
+    statement: "D011: monitoring and alerting are defined and operated in the observability tier, not inside individual applications"
+    saves: "skip building in-app alerting that will be rejected in solutioning"
+    slug: "/solution_engineering/platform-decision-log/approved/#d011-centralize-monitoring-and-alerting-in-the-observability-tier"
+    file: "solution_engineering/platform-decision-log/approved.mdx"
+    line: 189
+    quote: "Monitoring and alerting are defined and operated in the observability tier, not inside individual applications"
+    match:
+      subject_any: ["monitoring", "alerting", "alerts"]
+      predicate_any: ["are", "is", "operated", "defined", "decides", "live"]
+      object_all: ["observability"]
+
+# =====================================================================
+# MUST NOT REMEMBER -- storing these costs context and buys no step
+# =====================================================================
+must_not_remember:
+
+  # --- field inventory: the archetypal non-actionable fact ---
+  - id: MN-01
+    kind: field_inventory
+    statement: "Special Offers has field data.descriptions.offer_intro"
+    why_not: "the agent must open the payload or schema anyway; a renamed field makes this actively misleading"
+    authoritative_source: "the Field Reference table in the source doc, and the payload itself"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 221
+    quote: "| `data.descriptions.offer_intro` | Introductory marketing copy |"
+    match:
+      subject_any: ["special offers"]
+      predicate_any: ["field", "has field", "has"]
+      object_all: ["data.descriptions.offer_intro"]
+
+  - id: MN-02
+    kind: field_inventory
+    statement: "Special Offers has field data.descriptions.offer_detail"
+    why_not: "field name only; no step is skipped and the name can change upstream"
+    authoritative_source: "the Field Reference table in the source doc"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 222
+    quote: "| `data.descriptions.offer_detail` | Detailed offer terms and conditions |"
+    match:
+      subject_any: ["special offers"]
+      predicate_any: ["field", "has field", "has"]
+      object_all: ["data.descriptions.offer_detail"]
+
+  - id: MN-03
+    kind: field_inventory
+    statement: "Special Offers has field data.descriptions.detail_highlights"
+    why_not: "field name only; no step is skipped"
+    authoritative_source: "the Field Reference table in the source doc"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 223
+    quote: "| `data.descriptions.detail_highlights` | Short highlight summary of savings |"
+    match:
+      subject_any: ["special offers"]
+      predicate_any: ["field", "has field", "has"]
+      object_all: ["data.descriptions.detail_highlights"]
+
+  - id: MN-04
+    kind: field_inventory
+    statement: "Special Offers has field data.descriptions.offer_detail_page"
+    why_not: "field name only; no step is skipped"
+    authoritative_source: "the Field Reference table in the source doc"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 224
+    quote: "| `data.descriptions.offer_detail_page` | Full offer detail page content with formatting |"
+    match:
+      subject_any: ["special offers"]
+      predicate_any: ["field", "has field", "has"]
+      object_all: ["data.descriptions.offer_detail_page"]
+
+  - id: MN-05
+    kind: field_inventory
+    statement: "Special Offers has field data.destination"
+    why_not: "field name only; no step is skipped"
+    authoritative_source: "the Field Reference table in the source doc"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 216
+    quote: "| `data.destination` | Resort destination ID |"
+    match:
+      subject_any: ["special offers"]
+      predicate_any: ["field", "has field", "has"]
+      object_all: ["data.destination"]
+
+  - id: MN-06
+    kind: field_inventory
+    statement: "Special Offers has field data.components"
+    why_not: "field name only; no step is skipped"
+    authoritative_source: "the Field Reference table in the source doc"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 217
+    quote: "| `data.components` | Offer component type |"
+    match:
+      subject_any: ["special offers"]
+      predicate_any: ["field", "has field", "has"]
+      object_all: ["data.components"]
+
+  - id: MN-07
+    kind: field_inventory
+    statement: "Special Offers has field data.type"
+    why_not: "field name only; no step is skipped"
+    authoritative_source: "the Field Reference table in the source doc"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 218
+    quote: "| `data.type` | Offer classification type |"
+    match:
+      subject_any: ["special offers"]
+      predicate_any: ["field", "has field", "has"]
+      object_all: ["data.type"]
+
+  - id: MN-08
+    kind: field_inventory
+    statement: "Special Offers has field data.featured_offer"
+    why_not: "field name only; no step is skipped"
+    authoritative_source: "the Field Reference table in the source doc"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 237
+    quote: "| `data.featured_offer` | Whether the offer is featured/promoted |"
+    match:
+      subject_any: ["special offers"]
+      predicate_any: ["field", "has field", "has"]
+      object_all: ["data.featured_offer"]
+
+  - id: MN-09
+    kind: field_inventory
+    statement: "Special Offers has field data.resorts"
+    why_not: "field name only; the value is an unbounded ID list that goes stale immediately"
+    authoritative_source: "the Field Reference table in the source doc"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 235
+    quote: "| `data.resorts` | List of eligible resort facility IDs |"
+    match:
+      subject_any: ["special offers"]
+      predicate_any: ["field", "has field", "has"]
+      object_all: ["data.resorts"]
+
+  - id: MN-10
+    kind: field_inventory
+    statement: "Special Offers has field data.web_links.wdw_offer_detail"
+    why_not: "one row of an endpoint/URL catalogue; the URL is per-record data, not a reusable shortcut"
+    authoritative_source: "the Field Reference table in the source doc"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 241
+    quote: "| `data.web_links.wdw_offer_detail` | URL to the offer detail page |"
+    match:
+      subject_any: ["special offers"]
+      predicate_any: ["field", "has field", "has"]
+      object_all: ["data.web_links.wdw_offer_detail"]
+
+  - id: MN-11
+    kind: field_inventory
+    statement: "Special Offers has field data.web_links.wdw_offer_highlights"
+    why_not: "one row of an endpoint/URL catalogue"
+    authoritative_source: "the Field Reference table in the source doc"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 242
+    quote: "| `data.web_links.wdw_offer_highlights` | URL to the offer highlights page |"
+    match:
+      subject_any: ["special offers"]
+      predicate_any: ["field", "has field", "has"]
+      object_all: ["data.web_links.wdw_offer_highlights"]
+
+  - id: MN-12
+    kind: field_inventory
+    statement: "Special Offers has field data.web_links.wdw_offer_book_now"
+    why_not: "one row of an endpoint/URL catalogue"
+    authoritative_source: "the Field Reference table in the source doc"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 243
+    quote: "| `data.web_links.wdw_offer_book_now` | URL to the offer booking page |"
+    match:
+      subject_any: ["special offers"]
+      predicate_any: ["field", "has field", "has"]
+      object_all: ["data.web_links.wdw_offer_book_now"]
+
+  - id: MN-13
+    kind: field_inventory
+    statement: "Special Offers has field id"
+    why_not: "every record type has an id; storing that fact saves nothing"
+    authoritative_source: "the Field Reference table in the source doc"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 215
+    quote: "| `id` | Unique document identifier |"
+    match:
+      subject_any: ["special offers"]
+      predicate_any: ["field", "has field", "has"]
+      object_all: ["id"]
+      object_any_groups:
+        - ["has field id"]
+
+  - id: MN-14
+    kind: field_inventory
+    statement: "Special Offers has field data.facets"
+    why_not: "field name only; the interesting part is the VALUE semantics, which this does not carry (see EC-01)"
+    authoritative_source: "the Field Reference table in the source doc"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 236
+    quote: "| `data.facets` | Faceted metadata for search filtering |"
+    match:
+      subject_any: ["special offers"]
+      predicate_any: ["field", "has field", "has"]
+      object_all: ["data.facets"]
+
+  # --- enum member lists ---
+  - id: MN-15
+    kind: enum_members
+    statement: "data.applicable_user_types takes the values GUEST and TRAVEL_AGENT"
+    why_not: "an enum roster; the agent reads the value at runtime and new members are added upstream without notice"
+    authoritative_source: "the payload / the D-Scribe schema"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 234
+    quote: "| `data.applicable_user_types` | User types eligible for the offer |"
+    match:
+      subject_any: ["special offers", "applicable_user_types"]
+      predicate_any: ["values", "types", "has", "field", "includes"]
+      object_any_groups:
+        - ["guest", "travel_agent"]
+        - ["applicable_user_types"]
+
+  - id: MN-16
+    kind: enum_members
+    statement: "data.suppress_from_locale contains es-ar, es-mx, en-eu, en_GB, ... (the locale roster)"
+    why_not: "a volatile membership list; the rule that matters is behavioural, not the roster (see EC-02)"
+    authoritative_source: "the payload"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 246
+    quote: "| `data.suppress_from_locale` | Locales where the offer should not appear |"
+    match:
+      subject_any: ["special offers", "suppress_from_locale"]
+      predicate_any: ["locales", "list", "contains", "has", "field"]
+      object_any_groups:
+        - ["es-ar", "es-mx"]
+        - ["suppress_from_locale"]
+
+  - id: MN-17
+    kind: enum_members
+    statement: "data.resorts contains resort facility IDs 80010402, 80010400, 80010401, ..."
+    why_not: "raw sample-payload identifiers -- pure noise with a stale-data hazard"
+    authoritative_source: "the payload"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 125
+    quote: "\"80010402\","
+    match:
+      subject_any: ["special offers", "resorts", "data.resorts"]
+      predicate_any: ["contains", "list", "includes", "has"]
+      object_any_groups:
+        - ["80010402"]
+        - ["80010400"]
+
+  - id: MN-18
+    kind: sample_values
+    statement: "The Special Offers example record was ingested by n8n workflow X5Rz3oA71rQLHWsv, execution 1419245"
+    why_not: "sample-payload provenance values -- true of one demo record only"
+    authoritative_source: "the payload"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 200
+    quote: "\"jedai_last_workflow_id\": \"X5Rz3oA71rQLHWsv\","
+    match:
+      subject_any: ["special offers", "workflow", "record"]
+      predicate_any: ["ingested", "workflow", "execution", "has"]
+      object_any_groups:
+        - ["x5rz3oa71rqlhwsv"]
+        - ["1419245"]
+
+  # --- endpoint path catalogues (authoritative source is openapi.json) ---
+  - id: MN-19
+    kind: endpoint_catalogue
+    statement: "Embeddings are at POST /v1/embeddings, images at POST /v1/images/generations, audio at POST /v1/audio/speech, batches at POST /v1/batches"
+    why_not: "a path catalogue whose authoritative source is the auto-generated OpenAPI schema (openapi.json); the doc itself points there"
+    authoritative_source: "openapi.json via /api/overview/"
+    slug: "/products/jedai-gateway/api-integration-guide/#endpoint-catalog"
+    file: "products/jedai-gateway/api-integration-guide.mdx"
+    line: 122
+    quote: "For auto-generated request/response schemas, see the [API Overview]"
+    match:
+      subject_any: ["gateway", "embeddings", "images", "audio", "batch", "batches"]
+      predicate_any: ["endpoint", "path", "post", "at", "exposes", "has"]
+      object_any_groups:
+        - ["/v1/embeddings"]
+        - ["/v1/images/generations"]
+        - ["/v1/audio/speech"]
+        - ["/v1/batches"]
+
+  - id: MN-20
+    kind: endpoint_catalogue
+    statement: "Translation passthrough is at POST /vertex_ai/translation/v3/projects/{project}/locations/us-central1:{operation}"
+    why_not: "a templated path from the same catalogue; openapi.json is authoritative and the template is unusable without the schema"
+    authoritative_source: "openapi.json via /api/overview/"
+    slug: "/products/jedai-gateway/api-integration-guide/#endpoint-catalog"
+    file: "products/jedai-gateway/api-integration-guide.mdx"
+    line: 120
+    quote: "`POST /vertex_ai/translation/v3/projects/{project}/locations/us-central1:{operation}`"
+    match:
+      subject_any: ["translation", "vertex", "gateway"]
+      predicate_any: ["endpoint", "path", "post", "at", "passthrough"]
+      object_any_groups:
+        - ["/vertex_ai/translation/v3/projects/{project}/locations/us-central1:{operation}"]
+        - ["vertex_ai/translation/v3"]
+
+  # --- navigation / card catalogues restated as facts ---
+  - id: MN-21
+    kind: catalogue
+    statement: "D-Scribe publishes feeds: Featured Listings, Deep Link Containers, Facility Cast, Facility Guest, Non-Facility Cast, Entity, Media Bundle, Page, Photopass Page"
+    why_not: "a navigation card grid restated one card at a time; it names things without telling the agent where anything is or what to do"
+    authoritative_source: "the sidebar / the source index page"
+    slug: "/platform/knowledgebase/sources/dscribe/#available-feeds"
+    file: "platform/knowledgebase/sources/dscribe/index.mdx"
+    line: 19
+    quote: "<LinkCard title=\"Featured Listings\""
+    match:
+      subject_any: ["d-scribe", "dscribe"]
+      predicate_any: ["publishes", "feed", "has feed", "provides"]
+      object_any_groups:
+        - ["featured listings"]
+        - ["deep link containers"]
+        - ["media bundle"]
+        - ["photopass page"]
+
+  - id: MN-22
+    kind: catalogue
+    statement: "Source categories: SharePoint is internal documentation, Zendesk is call center content, Disney Parks Blog is park news, planDisney is trip planning"
+    why_not: "one-line card blurbs; each restates the source's name in longer form and saves no step"
+    authoritative_source: "the sources index page"
+    slug: "/platform/knowledgebase/sources/#source-categories"
+    file: "platform/knowledgebase/sources/index.mdx"
+    line: 33
+    quote: "Call center scripts, help center articles, and support documentation"
+    match:
+      subject_any: ["sharepoint", "zendesk", "disney parks blog", "plandisney"]
+      predicate_any: ["is", "source", "provides"]
+      object_any_groups:
+        - ["call center", "support"]
+        - ["internal documentation", "operational"]
+        - ["blog", "park news"]
+        - ["trip planning"]
+
+  - id: MN-23
+    kind: catalogue
+    statement: "The Jedai platform has four pillars: Models, Knowledge, Agents, Governance"
+    why_not: "a marketing taxonomy from a mermaid diagram; it renames the product surface without enabling an action"
+    authoritative_source: "the gateway landing page diagram"
+    slug: "/products/jedai-gateway/#where-the-gateway-fits"
+    file: "products/jedai-gateway/index.mdx"
+    line: 30
+    quote: "M[\"Models<br/>Approved frontier models"
+    match:
+      subject_any: ["jedai platform", "platform"]
+      predicate_any: ["pillar", "pillars", "has"]
+      object_any_groups:
+        - ["pillar"]
+
+  - id: MN-24
+    kind: catalogue
+    statement: "The gateway docs cover onboarding, use case launch, spend and compliance, cost and latency optimization, MCP tools, and v1 migration"
+    why_not: "the 'Where to Start' card grid restated as facts -- a table of contents, not a shortcut"
+    authoritative_source: "the site navigation"
+    slug: "/products/jedai-gateway/#where-to-start"
+    file: "products/jedai-gateway/index.mdx"
+    line: 290
+    quote: "<LinkCard title=\"I'm building an integration\""
+    match:
+      subject_any: ["jedai gateway", "gateway"]
+      predicate_any: ["documents", "covers", "describes"]
+      object_any_groups:
+        - ["documents"]
+
+  - id: MN-25
+    kind: catalogue
+    statement: "Jedai Chat, Jedai Agent Builder, and Jedai Evals all connect through Jedai Gateway"
+    why_not: "a diagram restatement; knowing which sibling products exist skips no step in any gateway task"
+    authoritative_source: "the platform architecture diagram"
+    slug: "/products/jedai-gateway/#platform-architecture"
+    file: "products/jedai-gateway/index.mdx"
+    line: 232
+    quote: "Chat[Jedai Chat] --> GW"
+    match:
+      subject_any: ["jedai chat", "jedai evals", "jedai agent builder", "agent builder"]
+      predicate_any: ["connects", "connect", "through"]
+      object_any_groups:
+        - ["jedai gateway"]
+        - ["gateway"]
+
+  - id: MN-26
+    kind: catalogue
+    statement: "Role glossary prose: the Jedai Chancellor provides read-only visibility across the platform; the Developer calls AI APIs and views own usage"
+    why_not: "job descriptions, not shortcuts; the only operational token in that table is the role STRING (see EC-05)"
+    authoritative_source: "the role glossary table"
+    slug: "/products/jedai-gateway/#role-glossary"
+    file: "products/jedai-gateway/index.mdx"
+    line: 318
+    quote: "Read-only visibility across the entire platform (FinOps/Auditors)"
+    match:
+      subject_any: ["jedai chancellor", "developer", "chancellor"]
+      predicate_any: ["responsible", "does", "provides", "views"]
+      object_any_groups:
+        - ["read-only visibility"]
+        - ["views own usage"]
+
+  # --- prose restatements ---
+  - id: MN-27
+    kind: prose
+    statement: "Jedai Gateway is Disney's enterprise AI control plane"
+    why_not: "a positioning sentence; it is the page title in longer form and skips no step"
+    authoritative_source: "the page description frontmatter"
+    slug: "/products/jedai-gateway/"
+    file: "products/jedai-gateway/index.mdx"
+    line: 17
+    quote: "Jedai Gateway is Disney's enterprise AI control plane."
+    match:
+      subject_any: ["jedai gateway"]
+      predicate_any: ["is"]
+      object_any_groups:
+        - ["enterprise ai control plane"]
+        - ["control plane"]
+
+  - id: MN-28
+    kind: prose
+    statement: "D-Scribe handles vast amounts of information and activity and delivers content in many different languages"
+    why_not: "descriptive filler; no path, no owner, no threshold, no action"
+    authoritative_source: "the D-Scribe overview page"
+    slug: "/platform/knowledgebase/sources/dscribe/"
+    file: "platform/knowledgebase/sources/dscribe/index.mdx"
+    line: 8
+    quote: "D-Scribe handles vast amounts of information and activity"
+    match:
+      subject_any: ["d-scribe", "dscribe"]
+      predicate_any: ["handles", "delivers", "is"]
+      object_any_groups:
+        - ["vast amounts"]
+        - ["many different languages"]
+
+  - id: MN-29
+    kind: prose
+    statement: "Special Offers represent promotional deals, discounts, and vacation packages surfaced to guests across Disney digital platforms"
+    why_not: "a definition of a self-describing name"
+    authoritative_source: "the Special Offers page intro"
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 12
+    quote: "Special Offers represent promotional deals, discounts, and vacation packages"
+    match:
+      subject_any: ["special offers"]
+      predicate_any: ["is", "are", "represent", "includes"]
+      object_any_groups:
+        - ["promotional deals"]
+        - ["vacation packages"]
+
+  - id: MN-30
+    kind: prose
+    statement: "Pocket Guides distill key tips, must-do experiences, and practical advice into a compact format"
+    why_not: "editorial description of a self-describing name"
+    authoritative_source: "the Pocket Guides page intro"
+    slug: "/platform/knowledgebase/sources/plandisney/pocket-guides/"
+    file: "platform/knowledgebase/sources/plandisney/pocket-guides.mdx"
+    line: 6
+    quote: "distills key tips, must-do experiences, and practical advice"
+    match:
+      subject_any: ["pocket guides"]
+      predicate_any: ["is", "are", "distills", "distill"]
+      object_any_groups:
+        - ["key tips"]
+        - ["must-do experiences"]
+
+  - id: MN-31
+    kind: prose
+    statement: "The KB pipeline connects to the upstream system, extracts and normalizes content, chunks and embeds it, and syncs on a schedule"
+    why_not: "a generic RAG pipeline description true of every ingestion system; it names no cadence, no credential, no endpoint"
+    authoritative_source: "the sources index page"
+    slug: "/platform/knowledgebase/sources/#how-sources-work"
+    file: "platform/knowledgebase/sources/index.mdx"
+    line: 18
+    quote: "**Chunks and embeds** the content into vector representations"
+    match:
+      subject_any: ["knowledge base", "jedai knowledge base", "pipeline", "knowledge source"]
+      predicate_any: ["chunks", "embeds", "extracts", "connects", "normalizes"]
+      object_any_groups:
+        - ["chunks", "embeds"]
+        - ["normalizes", "common schema"]
+        - ["vector representations"]
+
+  - id: MN-32
+    kind: prose
+    statement: "Measured impact: 70-90% onboarding lead-time reduction, 30-60% fewer support tickets, 95% spend attribution, 30-50% faster MTTD"
+    why_not: "self-declared conservative estimates, not measurements; acting on them is unsound and they date instantly"
+    authoritative_source: "none -- the doc calls them estimates"
+    slug: "/products/jedai-gateway/#key-value-props"
+    file: "products/jedai-gateway/index.mdx"
+    line: 163
+    quote: "These are conservative estimates based on observed v1 scaling challenges"
+    match:
+      subject_any: ["jedai gateway", "gateway", "onboarding", "platform support tickets", "mttd"]
+      predicate_any: ["reduction", "reduces", "faster", "fewer", "rate", "impact"]
+      object_any_groups:
+        - ["70-90%"]
+        - ["30-60%"]
+        - ["30-50%"]
+
+  - id: MN-33
+    kind: prose
+    statement: "Reasoning models think before answering, consuming tokens on internal chain-of-thought before visible output"
+    why_not: "general LLM background knowledge the agent already has; not Disney-specific and not step-saving"
+    authoritative_source: "provider documentation"
+    slug: "/products/jedai-gateway/api-integration-guide/#reasoning-and-codex-models"
+    file: "products/jedai-gateway/api-integration-guide.mdx"
+    line: 459
+    quote: "Reasoning models \"think\" before answering"
+    match:
+      subject_any: ["reasoning models", "reasoning model"]
+      predicate_any: ["think", "consume", "improves", "are"]
+      object_any_groups:
+        - ["chain-of-thought"]
+        - ["think", "before answering"]
+
+  - id: MN-34
+    kind: sample_values
+    statement: "A chat completion response looks like id chatcmpl-abc123 with prompt_tokens 14, completion_tokens 12, total_tokens 26"
+    why_not: "literal values from a documentation example; storing them risks an agent asserting a fabricated response"
+    authoritative_source: "the example block / openapi.json"
+    slug: "/products/jedai-gateway/onboarding/#step-6-make-your-first-api-call"
+    file: "products/jedai-gateway/onboarding.mdx"
+    line: 199
+    quote: "\"id\": \"chatcmpl-abc123\","
+    match:
+      subject_any: ["response", "chat completion", "gateway"]
+      predicate_any: ["returns", "has", "is", "example"]
+      object_any_groups:
+        - ["chatcmpl-abc123"]
+        - ["prompt_tokens", "14"]
+
+# =====================================================================
+# EDGE CASES -- the genuinely arguable calls; scored separately
+# =====================================================================
+edge_cases:
+
+  - id: EC-01
+    kind: behaviour_controlling_field
+    expected: keep
+    statement: "The facet wdw_finder_not_searchable controls whether an offer is excluded from WDW finder search results"
+    reasoning: >-
+      This is a field, so the field-inventory rule would drop it -- but the field's VALUE gates
+      behaviour, exactly the stated exception ("the `authorship` frontmatter gates whether content
+      is human-certified"). An agent that knows this skips debugging why an offer is missing from
+      search results. A gate that keys on the SHAPE ("X has field Y") drops it; a gate that keys on
+      the CONSEQUENCE keeps it.
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 122
+    quote: "\"wdw_finder_not_searchable\": \"true\""
+    match:
+      subject_any: ["special offers", "facets", "offer"]
+      predicate_any: ["controls", "gates", "excludes", "field", "has", "determines"]
+      object_all: ["wdw_finder_not_searchable"]
+
+  - id: EC-02
+    kind: behaviour_controlling_field
+    expected: keep
+    statement: "suppress_from_locale determines the locales in which an offer must NOT be displayed"
+    reasoning: >-
+      The behavioural RULE qualifies (an agent that surfaces a suppressed offer creates a
+      compliance problem); the MEMBERSHIP LIST does not (MN-16). The gate must split one sentence
+      in the source doc into a keep and a drop -- the hardest kind of call, and the one most likely
+      to be resolved by keeping both or dropping both.
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/#example"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 246
+    quote: "Locales where the offer should not appear"
+    match:
+      subject_any: ["special offers", "offer", "suppress_from_locale"]
+      predicate_any: ["should not", "suppressed", "not appear", "determines", "controls"]
+      object_any_groups:
+        - ["suppress_from_locale"]
+        - ["locales", "not appear"]
+
+  - id: EC-03
+    kind: version_pinned
+    expected: keep
+    statement: "The 99.99% availability target has a timing of CY 2027 -- it is not the current target"
+    reasoning: >-
+      Actionable ONLY with the date qualifier attached. Stored as "the platform targets 99.99%" it
+      is actively misleading today (integration is 99.5% and the four-nines work is future-dated).
+      The correct call is keep-with-qualifier; a gate that stores the number without the temporal
+      bound has produced a worse memory than none. Arguable because the same sentence is either the
+      most useful fact on the page or a trap, depending entirely on whether the qualifier survives.
+    slug: "/solution_engineering/platform-decision-log/approved/#d001-standard-platform-classes"
+    file: "solution_engineering/platform-decision-log/approved.mdx"
+    line: 26
+    quote: "99.99% availability target timing is CY 2027"
+    match:
+      subject_any: ["99.99%", "availability", "platform", "d001"]
+      predicate_any: ["target", "timing", "is", "decides", "has"]
+      object_all: ["cy", "2027"]
+
+  - id: EC-04
+    kind: trap_avoider
+    expected: keep
+    statement: "gpt-5-chat and gpt-5-chat-latest are NOT reasoning models despite the GPT-5 prefix"
+    reasoning: >-
+      Structurally this is one row of a model catalogue (MUST-NOT shape), but its content is a
+      negation that prevents a wrong inference an agent would otherwise make from the name. The
+      step it saves is real: not sending reasoning_effort to a model that ignores it. Gates that
+      classify by row-of-a-table will drop this.
+    slug: "/products/jedai-gateway/api-integration-guide/#available-models"
+    file: "products/jedai-gateway/api-integration-guide.mdx"
+    line: 472
+    quote: "Standard chat behavior despite the GPT-5 prefix"
+    match:
+      subject_any: ["gpt-5-chat", "gpt-5-chat-latest"]
+      predicate_any: ["not", "is", "are", "standard chat"]
+      object_any_groups:
+        - ["not reasoning"]
+        - ["standard chat behavior"]
+
+  - id: EC-05
+    kind: identifier_vs_prose
+    expected: keep
+    statement: "The Team Admin persona maps to the LiteLLM role string team_admin"
+    reasoning: >-
+      The surrounding glossary is a catalogue (MN-26), but the role STRING is the literal value an
+      agent must send to the API. Persona-to-identifier mappings are shortcuts; persona-to-prose
+      descriptions are not. The gate must keep half a table row and drop the other half.
+    slug: "/products/jedai-gateway/#role-glossary"
+    file: "products/jedai-gateway/index.mdx"
+    line: 320
+    quote: "| **Team Admin** | `team_admin` |"
+    match:
+      subject_any: ["team admin"]
+      predicate_any: ["holds", "role", "is", "maps"]
+      object_all: ["team_admin"]
+
+  - id: EC-06
+    kind: combination_only
+    expected: drop
+    statement: "The max_fallbacks depth counter defaults to 5"
+    reasoning: >-
+      A real tunable, but actionable only in combination with a configured fallback chain the agent
+      cannot see and does not control. On its own it skips no step. Contrast MR-19 (drop_params),
+      which changes the observable behaviour of a call the agent is making right now. This is the
+      clearest test of whether the gate demands a NAMED step rather than mere technical specificity.
+    slug: "/products/jedai-gateway/api-integration-guide/#when-do-fallbacks-trigger"
+    file: "products/jedai-gateway/api-integration-guide.mdx"
+    line: 801
+    quote: "A `max_fallbacks` depth counter (default **5**) prevents infinite recursion"
+    match:
+      subject_any: ["max_fallbacks", "fallbacks", "router"]
+      predicate_any: ["default", "defaults", "is", "prevents"]
+      object_all: ["max_fallbacks"]
+
+  - id: EC-07
+    kind: diagnostic_header
+    expected: keep
+    statement: "x-litellm-attempted-fallbacks in the response headers reveals whether a fallback served the request (0 = primary)"
+    reasoning: >-
+      Looks like a header catalogue row. It qualifies because the JSON body does not tell you a
+      fallback happened -- this header is the only way to answer "why did I get a different model?"
+      without a support ticket. Arguable because three sibling headers in the same table are much
+      weaker candidates.
+    slug: "/products/jedai-gateway/api-integration-guide/#response-headers"
+    file: "products/jedai-gateway/api-integration-guide.mdx"
+    line: 777
+    quote: "| `x-litellm-attempted-fallbacks` | Fallback hops taken"
+    match:
+      subject_any: ["x-litellm-attempted-fallbacks", "response headers", "gateway"]
+      predicate_any: ["records", "reveals", "indicates", "is", "header"]
+      object_all: ["x-litellm-attempted-fallbacks"]
+
+  - id: EC-08
+    kind: person_routing
+    expected: drop
+    statement: "Governance requirements are documented by Ben; Robert applies them per component; Tae owns operational processes; Carlos owns intake governance"
+    reasoning: >-
+      This is ownership/routing, which normally qualifies -- "go to X for Y" is a genuine shortcut.
+      It is marked DROP because the routing key is a bare first name with no role identifier or
+      contact: people change roles far faster than the doc updates, and a stale name sends the agent
+      to the wrong human with full confidence. This is the entry I expect most disagreement on, and
+      the one that most sharply tests whether the gate weighs decay against step-saving.
+    slug: "/solution_engineering/platform-decision-log/approved/#d006-jedai-helix-collaboration"
+    file: "solution_engineering/platform-decision-log/approved.mdx"
+    line: 118
+    quote: "| **Governance (Ben)** | Document explicit data governance requirements |"
+    match:
+      subject_any: ["governance", "engineering", "operations", "product", "ben", "robert", "tae", "carlos"]
+      predicate_any: ["responsible", "documents", "owns", "develops", "applies"]
+      object_any_groups:
+        - ["ben"]
+        - ["robert"]
+        - ["tae"]
+        - ["carlos"]
+
+  - id: EC-09
+    kind: unqualified_threshold
+    expected: drop
+    statement: "The budget is $500"
+    reasoning: >-
+      Same number as MR-14, stripped of the qualifier that makes it usable. Without "team-level"
+      and "hard cap" an agent cannot tell whether $500 is per key, per team, or per month, and may
+      size a workload against the wrong ceiling. Included to test that the gate scores the
+      FORMULATION, not the topic -- a gate that matches on "budget threshold" alone keeps this.
+    slug: "/products/jedai-gateway/#key-value-props"
+    file: "products/jedai-gateway/index.mdx"
+    line: 153
+    quote: "$500 hard cap"
+    match:
+      subject_any: ["budget"]
+      predicate_any: ["is"]
+      object_all: ["$500"]
+      forbid_any: ["team", "hard", "cap", "per team", "team-level"]
+
+  - id: EC-10
+    kind: cadence
+    expected: keep
+    statement: "The Special Offers feed updates event-driven, not on a fixed schedule"
+    reasoning: >-
+      "Event-Driven" is a two-word table cell that reads like an attribute inventory. It qualifies
+      because it tells an agent not to wait for, or build, a polling schedule -- a concrete skipped
+      step. Arguable because the sibling cells in the same block ("Feed format", "Source team") vary
+      in value, so the gate cannot accept or reject the block as a unit.
+    slug: "/platform/knowledgebase/sources/dscribe/special-offers/"
+    file: "platform/knowledgebase/sources/dscribe/special-offers.mdx"
+    line: 22
+    quote: "**Update frequency**: Event-Driven"
+    match:
+      subject_any: ["special offers", "feed"]
+      predicate_any: ["update", "frequency", "cadence", "state", "has"]
+      object_any_groups:
+        - ["event-driven"]
+        - ["event driven"]
+
+# =====================================================================
+# TEMPORAL AUTHORITY -- WS-25 T5 gold-set regression
+# =====================================================================
+# NOT scored against the portal-KB graph above.  Scored against the tiny,
+# hermetic fixture graph `ingest/build_temporal_authority_fixture.py`
+# rebuilds on demand (see that script's docstring for the exact scenario:
+# a `preference` reinforced to corroboration_margin, then contradicted by an
+# equal-authority, newer observation).
+#
+# Pre-WS-25 this section scores 0/2: the corroborated incumbent stays current
+# truth (`insufficient_corroboration` parks the contradiction) and the fresher
+# statement never becomes visible to a reader.  WS-25 T2 makes `preference` a
+# recency-authoritative type, so the incumbent auto-closes and the section
+# scores 2/2 (1.0).
+#
+# `must_be_current`   -- the newer, post-contradiction statement must be
+#                        CURRENT TRUTH (context-visible).
+# `must_not_be_current` -- the superseded statement must NOT be current truth
+#                        (it may still exist on disk, superseded -- that is
+#                        the correct outcome, not a failure).
+# Same match contract as the bands above (subject_any / predicate_any /
+# object_all / object_any_groups / forbid_any); no file/line/quote citation
+# fields -- this section is not sourced from the portal and is exempt from
+# `--verify-citations`.
+temporal_authority:
+  meta:
+    description: >-
+      WS-25 T5: a scripted preference-set-then-contradicted fixture that
+      fails pre-WS-25 (stale value returned as current truth) and passes
+      after T2 (write-side auto-close) + T3 (read-side within-slot
+      tiebreaker).
+    build_script: "ingest/build_temporal_authority_fixture.py"
+    graph: "ingest/.memotron/temporal_authority_fixture.sqlite"
+
+  must_be_current:
+    - id: TA-01
+      statement: "The user's current preference is NOT dark mode -- the later, equal-authority contradiction is current truth"
+      saves: "skip re-deriving the user's current preference from a stale, corroborated-but-superseded fact"
+      match:
+        subject_any: ["user"]
+        predicate_any: ["prefers"]
+        object_all: ["not dark mode"]
+
+  must_not_be_current:
+    - id: TA-02
+      statement: "The original dark-mode preference is superseded, not current truth, even though it had reached corroboration-eligible observed_count before the contradiction arrived"
+      why_not: "recency-authoritative supersession (WS-25 T2) auto-closes a same-slot contradiction on a preference/directive/state slot when the challenger's authority is at least the incumbent's, regardless of corroboration count"
+      match:
+        subject_any: ["user"]
+        predicate_any: ["prefers"]
+        object_all: ["dark mode"]
+        forbid_any: ["not"]
+
+# =====================================================================
+# COMPACTION SURVIVAL -- WS-28 T3 (+ T1 companion) gold-set regression
+# =====================================================================
+# NOT scored against the portal-KB graph above.  Scored against the tiny,
+# hermetic fixture graph `ingest/build_compaction_survival_fixture.py`
+# rebuilds on demand: a transcript window with two DIFFERENT >=3-repeat
+# shell commands, one 2-repeat (below-threshold) command, and one
+# context_compaction checkpoint, run through
+# `AgentMemoryPlatform.record_runbook_commands` / `memory_log` + one dream
+# cycle.
+#
+# Pre-WS-28 this section scores 0/4 (CS-01/CS-02 fail: no runbook fact
+# exists at all before T3 lands) or, once command extraction lands but
+# before the write-side guard does, 3/4 with CS-02 specifically failing
+# (measured: the hermetic embedding transport puts
+# "...simulation.py --live" and "...simulation.py --live-fast" at cosine
+# 0.926, which clears the default semantic-dedup threshold of 0.88 -- with
+# `force_identifier_conflict` disabled this fixture reproducibly collapses
+# to 2 relationships instead of 3, the second command reinforcing the
+# first's row instead of creating its own; re-enabling the guard restores
+# 3).  CS-03 (vacuously true, nothing to capture) and CS-04 (`memory_log`
+# already existed pre-WS-28, so this one line was already passing -- it is
+# here to prove the checkpoint that seeds T1's immediate rehydration is not
+# a special, ephemeral thing, but ordinary durable memory once dreamt) are
+# unaffected by the guard either way.
+#
+# `must_be_current`     -- the fact must be CURRENT TRUTH (context-visible).
+# `must_not_be_current` -- the fact must NOT be current truth; for CS-03
+#                        this is satisfied vacuously (never stored at all),
+#                        which is the correct outcome, not a failure.
+# Same match contract as the bands above; no file/line/quote citation
+# fields -- this section is not sourced from the portal and is exempt from
+# `--verify-citations`.
+compaction_survival:
+  meta:
+    description: >-
+      WS-28 T3 (+T1 companion): a scripted transcript-window fixture proving
+      (a) a >=3-repeat verbatim command becomes a durable runbook fact,
+      (b) a lexically-close but DIFFERENT command becomes its own separate
+      fact rather than being semantically merged, (c) a 2-repeat command is
+      never captured, and (d) a context_compaction checkpoint is ordinary
+      durable memory once dreamt.
+    build_script: "ingest/build_compaction_survival_fixture.py"
+    graph: "ingest/.memotron/compaction_survival_fixture.sqlite"
+
+  must_be_current:
+    - id: CS-01
+      statement: "The agent's runbook records the exact live-simulation invocation after 3 repeats"
+      saves: "skip re-deriving how to run the live simulation from scratch after a compaction boundary"
+      match:
+        subject_any: ["compaction-fixture-agent"]
+        predicate_any: ["runs"]
+        object_all: ["examples/simulation.py", "live"]
+        forbid_any: ["live-fast"]
+
+    - id: CS-02
+      statement: "The agent's runbook ALSO records the --live-fast invocation as its own separate fact, distinct from CS-01"
+      saves: "skip re-deriving the --live-fast invocation; proves the write-side dedup guard kept two lexically-close (cosine 0.926 under the hermetic transport, above the 0.88 default threshold) commands from merging into one"
+      match:
+        subject_any: ["compaction-fixture-agent"]
+        predicate_any: ["runs"]
+        object_all: ["examples/simulation.py", "live-fast"]
+
+    - id: CS-04
+      statement: "The context_compaction checkpoint's task-focus text is durable, context-visible memory once dreamt"
+      saves: "answer 'what was I doing' from the profile with zero tool calls, even well after the compaction boundary that produced the checkpoint"
+      match:
+        subject_any: ["compaction-fixture-agent"]
+        predicate_any: ["has state", "state"]
+        object_all: ["task", "focus", "compaction", "survival"]
+
+  must_not_be_current:
+    - id: CS-03
+      statement: "A command invoked only twice is never captured as a runbook fact"
+      why_not: "repeated_commands()'s default min_repeats=3 gate: a one-off (or twice-off) command is not a demonstrated, stable pattern, so it is never memory -- capture requires N observations, not a single one"
+      match:
+        subject_any: ["compaction-fixture-agent"]
+        predicate_any: ["runs"]
+        object_all: ["tests/test_context.py", "pytest"]

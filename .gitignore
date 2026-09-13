@@ -1,0 +1,38 @@
+.env
+.memotron-*.log
+.memotron/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+.DS_Store
+.claude/worktrees/
+ui/admin/dist/
+ui/admin/node_modules/
+ui/admin/test-results/
+ui/admin/tsconfig.tsbuildinfo
+.tasks/
+.coverage
+.coverage.*
+.coverage-html/
+coverage.xml
+coverage.json
+# Root-level internal working notes: session plans, raw chat transcripts, and
+# patent-strategy drafts are scratch, not shared documentation. Keep them out of
+# git history the same way .tasks/ is. Documentation that IS shared (README.md,
+# DATAFLOW.md, AUDIT.md, INGEST.md, NEXT.md, PATENT*.md) is named, tracked, and
+# deliberately not matched by these patterns.
+/07_15.md
+/ADD.md
+/ANSWERS.md
+/CONVO.md
+/CONVO_*.md
+/NOTES.md
+/notes/
+# Helm dependency artifacts — fetched by `helm dependency update .helm`
+# (Harness passes --dependency-update); never vendored into git.
+.helm/charts/
+.helm/Chart.lock
+
+# Observation, not artifact -- the committed golden is tests/receipt_stream.golden.tsv
+.receipt_stream.tsv
+.storage_profile.tsv

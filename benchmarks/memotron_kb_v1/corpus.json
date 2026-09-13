@@ -1,0 +1,928 @@
+{
+  "_meta": {
+    "suite_name": "memotron-kb-v1",
+    "source": "memotron-kb-v1",
+    "official_metric": "category_f1",
+    "official_judge_protocol": "locomo-task_eval-evaluation@3eb6f2c",
+    "description": "Repo-owned synthetic evaluation corpus for the Memotron hermetic benchmark. Fictional enterprise-documentation domain: Northport Systems, an invented industrial-telemetry software company (no real organization). Authored in the LongMemEval item shape and scored with the deterministic LoCoMo category-F1 judge over the profile-top-evidence executor.",
+    "provenance": {
+      "source": "synthetic",
+      "license": "internal",
+      "generator": "hand-authored"
+    },
+    "bands": {
+      "single_fact_lookup": {
+        "question_type": "4",
+        "question_id_prefix": "single-"
+      },
+      "cross_page_join": {
+        "question_type": "1",
+        "question_id_prefix": "join-"
+      },
+      "temporal_supersession": {
+        "question_type": "2",
+        "question_id_prefix": "temporal-"
+      }
+    },
+    "answer_granularity": "Gold answers are authored at evidence-sentence granularity (the exact materialized fact text) so the deterministic executor is scored on retrieval selection, not span extraction.",
+    "temporal_design": "Each temporal scenario updates a single-active state slot in a later session; the retired value carries HIGHER confidence than its replacement, and every 'current' question deliberately ties on lexical overlap between the retired and updated values, so profile order (confidence-ranked) decides the answer \u2014 only genuine supersession removes the stale row and yields the updated value. The change is also recorded as a durable decision fact: 'historical' questions target the retired value via that change record."
+  },
+  "data": [
+    {
+      "question_id": "single-01",
+      "band": "single_fact_lookup",
+      "question_type": "4",
+      "question": "What does Northport Procurement require before vendor onboarding?",
+      "answer": "Northport Procurement requires before vendor onboarding a countersigned data processing agreement",
+      "question_date": "2026-03-10T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-02T09:00:00+00:00",
+        "2026-03-09T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "What does Northport Procurement require before vendor onboarding?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Procurement Handbook page of the Northport Systems handbook: vendor onboarding cannot start until legal paperwork clears.\nMemory: subject=Northport Procurement; predicate=requires before vendor onboarding; object=a countersigned data processing agreement; relationship_type=REQUIRES; confidence=0.9\nMemory: subject=Procurement Team; predicate=prefers; object=quarterly vendor reviews over annual audits; relationship_type=PREFERS; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "Anything else worth noting from this week's page updates?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Vendor Operations page of the Northport Systems handbook: the portal team also shared current supplier volume.\nMemory: subject=Vendor Portal; predicate=currently tracks; object=eighteen active supplier accounts; relationship_type=HAS_STATE; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "0"
+      ]
+    },
+    {
+      "question_id": "single-02",
+      "band": "single_fact_lookup",
+      "question_type": "4",
+      "question": "What does data hall access require at Northport?",
+      "answer": "Data Hall Access requires a hardware security key and an approved change ticket",
+      "question_date": "2026-03-11T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-03T09:00:00+00:00",
+        "2026-03-10T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "What does data hall access require at Northport?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Access Control Guide page of the Northport Systems handbook: physical entry rules are strict for the data halls.\nMemory: subject=Data Hall Access; predicate=requires; object=a hardware security key and an approved change ticket; relationship_type=REQUIRES; confidence=0.9\nMemory: subject=Facilities Team; predicate=should; object=rotate visitor badges every ninety days; relationship_type=SHOULD; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "Anything else worth noting from this week's page updates?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Facilities Notes page of the Northport Systems handbook: facilities also documented their badge hygiene practices.\nMemory: subject=Security Office; predicate=prefers; object=escorted tours for external contractors; relationship_type=PREFERS; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "0"
+      ]
+    },
+    {
+      "question_id": "single-03",
+      "band": "single_fact_lookup",
+      "question_type": "4",
+      "question": "How long must the Telemetry Archive retain raw sensor readings?",
+      "answer": "Telemetry Archive requires retention of raw sensor readings for thirteen months",
+      "question_date": "2026-03-12T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-04T09:00:00+00:00",
+        "2026-03-11T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "How long must the Telemetry Archive retain raw sensor readings?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Data Retention Policy page of the Northport Systems handbook: the retention policy sets the archive floor.\nMemory: subject=Telemetry Archive; predicate=requires retention of; object=raw sensor readings for thirteen months; relationship_type=REQUIRES; confidence=0.9\nMemory: subject=Archive Maintainers; predicate=should; object=verify checksum manifests after every compaction; relationship_type=SHOULD; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "Anything else worth noting from this week's page updates?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Observability Guide page of the Northport Systems handbook: the observability crew added chart guidance.\nMemory: subject=Dashboard Team; predicate=prefers; object=downsampled charts for fleet overviews; relationship_type=PREFERS; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "0"
+      ]
+    },
+    {
+      "question_id": "single-04",
+      "band": "single_fact_lookup",
+      "question_type": "4",
+      "question": "When should Release Engineering freeze production deploys?",
+      "answer": "Release Engineering should freeze production deploys during the annual maintenance window",
+      "question_date": "2026-03-13T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-05T09:00:00+00:00",
+        "2026-03-12T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "When should Release Engineering freeze production deploys?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Release Runbook page of the Northport Systems handbook: the runbook is explicit about the freeze.\nMemory: subject=Release Engineering; predicate=should; object=freeze production deploys during the annual maintenance window; relationship_type=SHOULD; confidence=0.9\nMemory: subject=Build Farm; predicate=currently runs; object=eleven concurrent integration lanes; relationship_type=HAS_STATE; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "Anything else worth noting from this week's page updates?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Build Infrastructure page of the Northport Systems handbook: build capacity notes were refreshed this week.\nMemory: subject=QA Guild; predicate=prefers; object=canary cohorts of five percent traffic; relationship_type=PREFERS; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "0"
+      ]
+    },
+    {
+      "question_id": "single-05",
+      "band": "single_fact_lookup",
+      "question_type": "4",
+      "question": "Which group owns the Corvus Billing revenue platform?",
+      "answer": "Corvus Billing is the revenue platform owned by the finance systems group",
+      "question_date": "2026-03-14T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-06T09:00:00+00:00",
+        "2026-03-13T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "Which group owns the Corvus Billing revenue platform?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Service Registry page of the Northport Systems handbook: the registry names each platform owner.\nMemory: subject=Corvus Billing; predicate=is; object=the revenue platform owned by the finance systems group; relationship_type=IDENTIFIES; confidence=0.9\nMemory: subject=Corvus Oncall; predicate=should; object=page finance duty managers for settlement stalls; relationship_type=SHOULD; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "Anything else worth noting from this week's page updates?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Billing Operations page of the Northport Systems handbook: billing operations captured escalation habits.\nMemory: subject=Invoice Designers; predicate=prefers; object=consolidated statements with itemized appendices; relationship_type=PREFERS; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "0"
+      ]
+    },
+    {
+      "question_id": "single-06",
+      "band": "single_fact_lookup",
+      "question_type": "4",
+      "question": "What incident did the Beacon Scheduler report during the April failover drill?",
+      "answer": "Beacon Scheduler reported a queue saturation incident during the April failover drill",
+      "question_date": "2026-03-15T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-07T09:00:00+00:00",
+        "2026-03-14T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "What incident did the Beacon Scheduler report during the April failover drill?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Incident Playbook page of the Northport Systems handbook: the playbook records what the drill surfaced.\nMemory: subject=Beacon Scheduler; predicate=reported; object=a queue saturation incident during the April failover drill; relationship_type=REPORTS_INCIDENT; confidence=0.9\nMemory: subject=Drill Coordinators; predicate=prefers; object=tabletop rehearsals before live failovers; relationship_type=PREFERS; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "Anything else worth noting from this week's page updates?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Scheduler Overview page of the Northport Systems handbook: the overview page lists partition topology.\nMemory: subject=Scheduler Fleet; predicate=currently spans; object=three regional partitions; relationship_type=HAS_STATE; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "0"
+      ]
+    },
+    {
+      "question_id": "single-07",
+      "band": "single_fact_lookup",
+      "question_type": "4",
+      "question": "What storage format did Data Infrastructure decide to standardize on for cold telemetry?",
+      "answer": "Data Infrastructure decided to standardize on columnar storage for cold telemetry",
+      "question_date": "2026-03-16T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-08T09:00:00+00:00",
+        "2026-03-15T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "What storage format did Data Infrastructure decide to standardize on for cold telemetry?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Architecture Decisions page of the Northport Systems handbook: the decision log captured the storage direction.\nMemory: subject=Data Infrastructure; predicate=decided; object=to standardize on columnar storage for cold telemetry; relationship_type=DECIDES; confidence=0.9\nMemory: subject=Warehouse Team; predicate=prefers; object=predictable nightly compaction schedules; relationship_type=PREFERS; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "Anything else worth noting from this week's page updates?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Warehouse Notes page of the Northport Systems handbook: the warehouse crew keeps its own habits page.\nMemory: subject=Ingest Interns; predicate=should; object=shadow a senior reviewer for schema changes; relationship_type=SHOULD; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "0"
+      ]
+    },
+    {
+      "question_id": "single-08",
+      "band": "single_fact_lookup",
+      "question_type": "4",
+      "question": "What sync approach does Field Operations prefer for handheld scanners?",
+      "answer": "Field Operations prefers offline-first sync for handheld scanners",
+      "question_date": "2026-03-17T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-09T09:00:00+00:00",
+        "2026-03-16T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "What sync approach does Field Operations prefer for handheld scanners?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Field Guide page of the Northport Systems handbook: field crews documented their sync preference after the outage.\nMemory: subject=Field Operations; predicate=prefers; object=offline-first sync for handheld scanners; relationship_type=PREFERS; confidence=0.9\nMemory: subject=Scanner Fleet; predicate=currently reports; object=firmware build 4482 across depots; relationship_type=HAS_STATE; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "Anything else worth noting from this week's page updates?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Depot Operations page of the Northport Systems handbook: depot practices were reviewed alongside.\nMemory: subject=Depot Managers; predicate=should; object=stage spare batteries at every loading dock; relationship_type=SHOULD; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "0"
+      ]
+    },
+    {
+      "question_id": "join-01",
+      "band": "cross_page_join",
+      "question_type": "1",
+      "question": "In which data hall is the service that fronts Corvus Billing hosted?",
+      "answer": "Atlas Gateway is hosted in the Frankfurt data hall",
+      "question_date": "2026-03-18T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-10T09:00:00+00:00",
+        "2026-03-17T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "Which upstream does Corvus Billing depend on?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Service Registry page of the Northport Systems handbook: the registry maps every dependency edge.\nMemory: subject=Corvus Billing; predicate=is fronted by; object=Atlas Gateway; relationship_type=IDENTIFIES; confidence=0.9\nMemory: subject=Gateway Oncall; predicate=prefers; object=regional dashboards during peak load; relationship_type=PREFERS; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "What are the operating characteristics of that upstream?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Hosting and Compliance page of the Northport Systems handbook: the hosting page records the operating details.\nMemory: subject=Atlas Gateway; predicate=is hosted in; object=the Frankfurt data hall; relationship_type=IDENTIFIES; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "question_id": "join-02",
+      "band": "cross_page_join",
+      "question_type": "1",
+      "question": "How is the metrics store that Halcyon Dashboards reads from encrypted?",
+      "answer": "Meridian Metrics Store is encrypted with customer-managed keys",
+      "question_date": "2026-03-19T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-11T09:00:00+00:00",
+        "2026-03-18T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "Which upstream does Halcyon Dashboards depend on?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Service Registry page of the Northport Systems handbook: the registry maps every dependency edge.\nMemory: subject=Halcyon Dashboards; predicate=reads from; object=the Meridian metrics store; relationship_type=IDENTIFIES; confidence=0.9\nMemory: subject=Dashboard Guild; predicate=should; object=review widget permissions each quarter; relationship_type=SHOULD; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "What are the operating characteristics of that upstream?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Hosting and Compliance page of the Northport Systems handbook: the hosting page records the operating details.\nMemory: subject=Meridian Metrics Store; predicate=is encrypted with; object=customer-managed keys; relationship_type=IDENTIFIES; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "question_id": "join-03",
+      "band": "cross_page_join",
+      "question_type": "1",
+      "question": "How often is the ledger reconciliation queue that the Night Audit Job publishes to drained?",
+      "answer": "Ledger Reconciliation Queue is drained by the settlement worker every six hours",
+      "question_date": "2026-03-20T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-12T09:00:00+00:00",
+        "2026-03-19T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "Which upstream does Night Audit Job depend on?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Service Registry page of the Northport Systems handbook: the registry maps every dependency edge.\nMemory: subject=Night Audit Job; predicate=publishes to; object=the Ledger Reconciliation queue; relationship_type=IDENTIFIES; confidence=0.9\nMemory: subject=Audit Owners; predicate=prefers; object=immutable export snapshots for examiners; relationship_type=PREFERS; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "What are the operating characteristics of that upstream?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Hosting and Compliance page of the Northport Systems handbook: the hosting page records the operating details.\nMemory: subject=Ledger Reconciliation Queue; predicate=is drained by; object=the settlement worker every six hours; relationship_type=IDENTIFIES; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "question_id": "join-04",
+      "band": "cross_page_join",
+      "question_type": "1",
+      "question": "What session token lifetime does the identity broker behind Pallet Tracker enforce?",
+      "answer": "Keystone Identity Broker enforces sixty minute session tokens for service accounts",
+      "question_date": "2026-03-21T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-13T09:00:00+00:00",
+        "2026-03-20T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "Which upstream does Pallet Tracker depend on?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Service Registry page of the Northport Systems handbook: the registry maps every dependency edge.\nMemory: subject=Pallet Tracker; predicate=authenticates through; object=the Keystone identity broker; relationship_type=IDENTIFIES; confidence=0.9\nMemory: subject=Tracker Team; predicate=should; object=recycle demo credentials after trade shows; relationship_type=SHOULD; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "What are the operating characteristics of that upstream?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Hosting and Compliance page of the Northport Systems handbook: the hosting page records the operating details.\nMemory: subject=Keystone Identity Broker; predicate=enforces; object=sixty minute session tokens for service accounts; relationship_type=REQUIRES; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "question_id": "join-05",
+      "band": "cross_page_join",
+      "question_type": "1",
+      "question": "What restore verification drills does the backup site for the Cold Storage Tier run?",
+      "answer": "Oslo Backup Site runs quarterly restore verification drills",
+      "question_date": "2026-03-22T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-14T09:00:00+00:00",
+        "2026-03-21T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "Which upstream does Cold Storage Tier depend on?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Service Registry page of the Northport Systems handbook: the registry maps every dependency edge.\nMemory: subject=Cold Storage Tier; predicate=replicates to; object=the Oslo backup site; relationship_type=IDENTIFIES; confidence=0.9\nMemory: subject=Storage Admins; predicate=prefers; object=checksummed snapshots over incremental diffs; relationship_type=PREFERS; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "What are the operating characteristics of that upstream?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Hosting and Compliance page of the Northport Systems handbook: the hosting page records the operating details.\nMemory: subject=Oslo Backup Site; predicate=runs; object=quarterly restore verification drills; relationship_type=HAS_STATE; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "question_id": "join-06",
+      "band": "cross_page_join",
+      "question_type": "1",
+      "question": "What approval does the signing service that Fleet Firmware Service signs builds with require for a key ceremony?",
+      "answer": "Bastion Signing Service requires dual operator approval for every release key ceremony",
+      "question_date": "2026-03-23T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-15T09:00:00+00:00",
+        "2026-03-22T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "Which upstream does Fleet Firmware Service depend on?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Service Registry page of the Northport Systems handbook: the registry maps every dependency edge.\nMemory: subject=Fleet Firmware Service; predicate=signs builds with; object=the Bastion signing service; relationship_type=IDENTIFIES; confidence=0.9\nMemory: subject=Firmware Testers; predicate=prefers; object=hardware-in-the-loop rigs for regressions; relationship_type=PREFERS; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "What are the operating characteristics of that upstream?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Hosting and Compliance page of the Northport Systems handbook: the hosting page records the operating details.\nMemory: subject=Bastion Signing Service; predicate=requires; object=dual operator approval for every release key ceremony; relationship_type=REQUIRES; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "question_id": "join-07",
+      "band": "cross_page_join",
+      "question_type": "1",
+      "question": "How long does the audit lake that the Guest Wifi Portal logs sessions to retain session logs?",
+      "answer": "Sentinel Audit Lake retains session logs for ninety days",
+      "question_date": "2026-03-24T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-16T09:00:00+00:00",
+        "2026-03-23T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "Which upstream does Guest Wifi Portal depend on?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Service Registry page of the Northport Systems handbook: the registry maps every dependency edge.\nMemory: subject=Guest Wifi Portal; predicate=logs sessions to; object=the Sentinel audit lake; relationship_type=IDENTIFIES; confidence=0.9\nMemory: subject=Portal Designers; predicate=prefers; object=captive pages with plain language terms; relationship_type=PREFERS; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "What are the operating characteristics of that upstream?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Hosting and Compliance page of the Northport Systems handbook: the hosting page records the operating details.\nMemory: subject=Sentinel Audit Lake; predicate=retains; object=session logs for ninety days; relationship_type=REQUIRES; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "question_id": "join-08",
+      "band": "cross_page_join",
+      "question_type": "1",
+      "question": "What license terms cover the Stratus feed that Route Planner pulls weather from?",
+      "answer": "Stratus Feed is licensed for internal operational use only",
+      "question_date": "2026-03-25T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-17T09:00:00+00:00",
+        "2026-03-24T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "Which upstream does Route Planner depend on?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Service Registry page of the Northport Systems handbook: the registry maps every dependency edge.\nMemory: subject=Route Planner; predicate=pulls weather from; object=the Stratus feed; relationship_type=IDENTIFIES; confidence=0.9\nMemory: subject=Planning Guild; predicate=should; object=flag stale forecasts older than six hours; relationship_type=SHOULD; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "What are the operating characteristics of that upstream?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Hosting and Compliance page of the Northport Systems handbook: the hosting page records the operating details.\nMemory: subject=Stratus Feed; predicate=is licensed for; object=internal operational use only; relationship_type=IDENTIFIES; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "question_id": "temporal-current-01",
+      "band": "temporal_supersession",
+      "question_type": "2",
+      "question": "What does the Helios Ingest Pipeline currently run?",
+      "answer": "Helios Ingest Pipeline currently runs a two-hour rolling refresh window",
+      "question_date": "2026-03-26T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-18T09:00:00+00:00",
+        "2026-03-25T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "What is the operating state of Helios Ingest Pipeline right now?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Runbook Snapshot page of the Northport Systems handbook: the runbook snapshot records the operating state.\nMemory: subject=Helios Ingest Pipeline; predicate=currently runs; object=a six-hour overnight batch cadence; relationship_type=HAS_STATE; confidence=0.93\nMemory: subject=Ingest Oncall; predicate=prefers; object=paged alerts only for stalled watermarks; relationship_type=PREFERS; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "Did anything change in this week's release?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Change Log page of the Northport Systems handbook: the change log records the update and its rationale.\nMemory: subject=Helios Ingest Pipeline; predicate=currently runs; object=a two-hour rolling refresh window; relationship_type=HAS_STATE; confidence=0.9\nMemory: subject=Platform Engineering; predicate=decided; object=to retire the six-hour overnight batch cadence in the March 2026 release; relationship_type=DECIDES; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "1"
+      ]
+    },
+    {
+      "question_id": "temporal-historical-01",
+      "band": "temporal_supersession",
+      "question_type": "2",
+      "question": "Which batch cadence did Platform Engineering retire in the March 2026 release?",
+      "answer": "Platform Engineering decided to retire the six-hour overnight batch cadence in the March 2026 release",
+      "question_date": "2026-03-26T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-18T09:00:00+00:00",
+        "2026-03-25T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "What is the operating state of Helios Ingest Pipeline right now?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Runbook Snapshot page of the Northport Systems handbook: the runbook snapshot records the operating state.\nMemory: subject=Helios Ingest Pipeline; predicate=currently runs; object=a six-hour overnight batch cadence; relationship_type=HAS_STATE; confidence=0.93\nMemory: subject=Ingest Oncall; predicate=prefers; object=paged alerts only for stalled watermarks; relationship_type=PREFERS; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "Did anything change in this week's release?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Change Log page of the Northport Systems handbook: the change log records the update and its rationale.\nMemory: subject=Helios Ingest Pipeline; predicate=currently runs; object=a two-hour rolling refresh window; relationship_type=HAS_STATE; confidence=0.9\nMemory: subject=Platform Engineering; predicate=decided; object=to retire the six-hour overnight batch cadence in the March 2026 release; relationship_type=DECIDES; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "1"
+      ]
+    },
+    {
+      "question_id": "temporal-current-02",
+      "band": "temporal_supersession",
+      "question_type": "2",
+      "question": "How does Corvus Billing currently settle?",
+      "answer": "Corvus Billing currently settles with daily automated settlement batches",
+      "question_date": "2026-03-27T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-19T09:00:00+00:00",
+        "2026-03-26T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "What is the operating state of Corvus Billing right now?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Runbook Snapshot page of the Northport Systems handbook: the runbook snapshot records the operating state.\nMemory: subject=Corvus Billing; predicate=currently settles with; object=weekly consolidated invoice runs; relationship_type=HAS_STATE; confidence=0.93\nMemory: subject=Billing Support; predicate=prefers; object=plain language dunning notices; relationship_type=PREFERS; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "Did anything change in this week's release?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Change Log page of the Northport Systems handbook: the change log records the update and its rationale.\nMemory: subject=Corvus Billing; predicate=currently settles with; object=daily automated settlement batches; relationship_type=HAS_STATE; confidence=0.9\nMemory: subject=Finance Systems Group; predicate=decided; object=to sunset weekly consolidated invoicing during the second quarter migration; relationship_type=DECIDES; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "1"
+      ]
+    },
+    {
+      "question_id": "temporal-historical-02",
+      "band": "temporal_supersession",
+      "question_type": "2",
+      "question": "What invoicing approach did the Finance Systems Group sunset during the second quarter migration?",
+      "answer": "Finance Systems Group decided to sunset weekly consolidated invoicing during the second quarter migration",
+      "question_date": "2026-03-27T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-19T09:00:00+00:00",
+        "2026-03-26T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "What is the operating state of Corvus Billing right now?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Runbook Snapshot page of the Northport Systems handbook: the runbook snapshot records the operating state.\nMemory: subject=Corvus Billing; predicate=currently settles with; object=weekly consolidated invoice runs; relationship_type=HAS_STATE; confidence=0.93\nMemory: subject=Billing Support; predicate=prefers; object=plain language dunning notices; relationship_type=PREFERS; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "Did anything change in this week's release?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Change Log page of the Northport Systems handbook: the change log records the update and its rationale.\nMemory: subject=Corvus Billing; predicate=currently settles with; object=daily automated settlement batches; relationship_type=HAS_STATE; confidence=0.9\nMemory: subject=Finance Systems Group; predicate=decided; object=to sunset weekly consolidated invoicing during the second quarter migration; relationship_type=DECIDES; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "1"
+      ]
+    },
+    {
+      "question_id": "temporal-current-03",
+      "band": "temporal_supersession",
+      "question_type": "2",
+      "question": "What does the Access Review Cycle currently span?",
+      "answer": "Access Review Cycle currently spans a rolling thirty day attestation window",
+      "question_date": "2026-03-28T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-20T09:00:00+00:00",
+        "2026-03-27T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "What is the operating state of Access Review Cycle right now?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Runbook Snapshot page of the Northport Systems handbook: the runbook snapshot records the operating state.\nMemory: subject=Access Review Cycle; predicate=currently spans; object=a quarterly ninety day recertification sweep; relationship_type=HAS_STATE; confidence=0.93\nMemory: subject=Review Champions; predicate=prefers; object=self-service dashboards for managers; relationship_type=PREFERS; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "Did anything change in this week's release?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Change Log page of the Northport Systems handbook: the change log records the update and its rationale.\nMemory: subject=Access Review Cycle; predicate=currently spans; object=a rolling thirty day attestation window; relationship_type=HAS_STATE; confidence=0.9\nMemory: subject=Security Governance; predicate=decided; object=to replace the quarterly recertification sweep with rolling attestations after the audit finding; relationship_type=DECIDES; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "1"
+      ]
+    },
+    {
+      "question_id": "temporal-historical-03",
+      "band": "temporal_supersession",
+      "question_type": "2",
+      "question": "What did Security Governance replace with rolling attestations after the audit finding?",
+      "answer": "Security Governance decided to replace the quarterly recertification sweep with rolling attestations after the audit finding",
+      "question_date": "2026-03-28T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-20T09:00:00+00:00",
+        "2026-03-27T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "What is the operating state of Access Review Cycle right now?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Runbook Snapshot page of the Northport Systems handbook: the runbook snapshot records the operating state.\nMemory: subject=Access Review Cycle; predicate=currently spans; object=a quarterly ninety day recertification sweep; relationship_type=HAS_STATE; confidence=0.93\nMemory: subject=Review Champions; predicate=prefers; object=self-service dashboards for managers; relationship_type=PREFERS; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "Did anything change in this week's release?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Change Log page of the Northport Systems handbook: the change log records the update and its rationale.\nMemory: subject=Access Review Cycle; predicate=currently spans; object=a rolling thirty day attestation window; relationship_type=HAS_STATE; confidence=0.9\nMemory: subject=Security Governance; predicate=decided; object=to replace the quarterly recertification sweep with rolling attestations after the audit finding; relationship_type=DECIDES; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "1"
+      ]
+    },
+    {
+      "question_id": "temporal-current-04",
+      "band": "temporal_supersession",
+      "question_type": "2",
+      "question": "What does the Edge Cache Fleet currently pin?",
+      "answer": "Edge Cache Fleet currently pins the hardened 2026 baseline image",
+      "question_date": "2026-03-29T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-21T09:00:00+00:00",
+        "2026-03-28T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "What is the operating state of Edge Cache Fleet right now?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Runbook Snapshot page of the Northport Systems handbook: the runbook snapshot records the operating state.\nMemory: subject=Edge Cache Fleet; predicate=currently pins; object=the legacy 2025 long term support image; relationship_type=HAS_STATE; confidence=0.93\nMemory: subject=Cache Operators; predicate=prefers; object=gradual eviction over cold restarts; relationship_type=PREFERS; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "Did anything change in this week's release?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Change Log page of the Northport Systems handbook: the change log records the update and its rationale.\nMemory: subject=Edge Cache Fleet; predicate=currently pins; object=the hardened 2026 baseline image; relationship_type=HAS_STATE; confidence=0.9\nMemory: subject=Platform Engineering; predicate=decided; object=to drop the legacy long term support image from the edge fleet in April; relationship_type=DECIDES; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "1"
+      ]
+    },
+    {
+      "question_id": "temporal-historical-04",
+      "band": "temporal_supersession",
+      "question_type": "2",
+      "question": "What image did Platform Engineering decide to drop from the edge fleet in April?",
+      "answer": "Platform Engineering decided to drop the legacy long term support image from the edge fleet in April",
+      "question_date": "2026-03-29T09:00:00+00:00",
+      "haystack_dates": [
+        "2026-03-21T09:00:00+00:00",
+        "2026-03-28T09:00:00+00:00"
+      ],
+      "haystack_sessions": [
+        [
+          {
+            "role": "user",
+            "content": "What is the operating state of Edge Cache Fleet right now?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Runbook Snapshot page of the Northport Systems handbook: the runbook snapshot records the operating state.\nMemory: subject=Edge Cache Fleet; predicate=currently pins; object=the legacy 2025 long term support image; relationship_type=HAS_STATE; confidence=0.93\nMemory: subject=Cache Operators; predicate=prefers; object=gradual eviction over cold restarts; relationship_type=PREFERS; confidence=0.9"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "Did anything change in this week's release?"
+          },
+          {
+            "role": "assistant",
+            "content": "Per the Change Log page of the Northport Systems handbook: the change log records the update and its rationale.\nMemory: subject=Edge Cache Fleet; predicate=currently pins; object=the hardened 2026 baseline image; relationship_type=HAS_STATE; confidence=0.9\nMemory: subject=Platform Engineering; predicate=decided; object=to drop the legacy long term support image from the edge fleet in April; relationship_type=DECIDES; confidence=0.9"
+          }
+        ]
+      ],
+      "answer_session_ids": [
+        "1"
+      ]
+    }
+  ]
+}

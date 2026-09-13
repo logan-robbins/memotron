@@ -1,0 +1,75 @@
+# Commit-time gate. Fast checks only -- the full gate is `bash scripts/check.sh`.
+#
+#   uvx pre-commit install          # once, per clone
+#   uvx pre-commit run --all-files  # to see everything at once
+#
+# mypy is DELIBERATELY ABSENT. pre-commit passes only the changed files, and mypy
+# on a subset of a package with this much cross-module typing reports a different
+# (often smaller) error set than a whole-package run, so a green hook would mean
+# nothing. The standard mirrors-mypy hook also needs `additional_dependencies`
+# duplicating pydantic/mcp/pyarrow/psycopg from pyproject.toml -- a second
+# dependency list guaranteed to drift from uv.lock. mypy runs whole-package in
+# scripts/check.sh and in CI, against the uv-resolved environment.
+#
+# ruff-format is also absent, and stays absent until the module split has merged:
+# running it now touches 138 files / 7,434 lines and destroys git blame mid-refactor.
+# See [tool.ruff.format] in pyproject.toml.
+default_language_version:
+  python: python3.12
+fail_fast: false
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        # Prose is excluded on purpose: README.md is 251K, DOGFOOD-LOG.md 173K and
+        # TAKEOVER-BACKLOG.md 94K. Reformatting them is pure diff noise, and the
+        # backlog in particular is an audit artifact.
+        # `.patch`/`.diff` are excluded because trailing whitespace is SIGNIFICANT
+        # in a unified diff: a blank context line is a single space, and stripping
+        # it corrupts the patch. Observed on the first --all-files run, which
+        # rewrote all three docs/findings/*.patch audit artifacts.
+        exclude: '\.(md|pdf|patch|diff)$'
+      - id: end-of-file-fixer
+        # `.patch`/`.diff` are excluded because trailing whitespace is SIGNIFICANT
+        # in a unified diff: a blank context line is a single space, and stripping
+        # it corrupts the patch. Observed on the first --all-files run, which
+        # rewrote all three docs/findings/*.patch audit artifacts.
+        exclude: '\.(md|pdf|patch|diff)$'
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+        # Helm templates are Go templates, not YAML, and do not parse.
+        exclude: '^\.helm/templates/'
+      - id: check-toml
+      - id: check-json
+        exclude: '^benchmarks/'
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        # The two PATENT PDFs (600K and 824K) are already tracked.
+        args: [--maxkb=1024]
+      - id: check-case-conflict
+      - id: debug-statements
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Pinned to match the `lint` dependency group exactly. An unpinned ruff means
+    # a new rule in a patch release reddens CI on a commit that changed nothing,
+    # which is how lint gates get disabled.
+    rev: v0.15.14
+    hooks:
+      - id: ruff-check
+        args: [--fix, --exit-non-zero-on-fix]
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: '^(uv\.lock|\.venv/|ui/admin/(node_modules|dist)/|.*\.pdf|.*\.sqlite.*)$'
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.9.7
+    hooks:
+      # Keeps uv.lock honest against pyproject.toml, so a dependency added by hand
+      # cannot land without its lock entry.
+      - id: uv-lock

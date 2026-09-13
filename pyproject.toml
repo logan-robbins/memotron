@@ -1,0 +1,946 @@
+[project]
+name = "jedai-memotron"
+version = "0.1.0"
+description = "Configurable offline memory formation and pruning over a scoped property graph."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "cryptography>=50.0.0",
+    # FastMCP 4 (#253). NOT the FastMCP vendored inside the `mcp` SDK -- this is the
+    # standalone project, and it pulls the SDK itself: fastmcp -> fastmcp-slim[client,server]
+    # -> mcp>=2.0.0,<3.0.0. So this single line is also the mcp 1.x -> 2.x upgrade (#184,
+    # subsumed). Upper-bounded deliberately: mcp-forge carries `fastmcp>=3.1.0` with NO
+    # upper bound, which means a routine `uv lock --upgrade` there would pull a major.
+    "fastmcp>=4.0.3,<5.0.0",
+    "pyarrow>=25.0.0",
+    "pydantic>=2.11.0",
+    "pyyaml>=6.0.3",
+]
+
+[project.optional-dependencies]
+# Operational Store engine (memotron.storage.postgres). Kept optional so the
+# hermetic SQLite path installs with no driver; the deployment image and the
+# Postgres-gated tests install with `--extra postgres`.
+postgres = [
+    "psycopg[binary,pool]>=3.2",
+]
+# Public-benchmark scoring (memotron.certification.LocalOfficialBenchmarkJudge). nltk is a full
+# NLP toolkit carried for ONE algorithm -- Porter stemming of LoCoMo tokens -- and nothing
+# deployed constructs that judge: no tool on examples/mcp_server.py and no admin route
+# reference it (verified by grep with positive controls, 2026-09-09). It was a REQUIRED
+# dependency until then, so `import memotron` pulled nltk into every process including
+# the deployment image. It has produced three advisories in a fortnight, the most recent
+# (GHSA-8mgp-746c-j5xp, HIGH) with NO patched version available, so "bump it" is not a
+# move that exists. We are not affected -- it needs model-artifact APIs and pathsec
+# enforcement, and we use neither -- but carrying an unpatchable HIGH in the shipped image
+# for a stemmer is not a trade worth making.
+benchmark = [
+    "nltk>=3.9.2",
+]
+# Telemetry (memotron.observability). Optional for the same reason as postgres:
+# every call site degrades to a no-op when these are absent, so the hermetic path and a
+# developer laptop install nothing extra, while the deployment image installs
+# `--extra otel`. The collector these export to is already running in the cluster
+# (splunk-otel-collector, observed 2026-09-03) -- see observability/otel.py for why the
+# module is vendored rather than depended on.
+otel = [
+    "opentelemetry-sdk>=1.27.0",
+    "opentelemetry-exporter-otlp-proto-http>=1.27.0",
+    "opentelemetry-instrumentation-asgi>=0.48b0",
+]
+
+[project.scripts]
+memotron = "memotron.cli:main"
+memotron-admin-server = "memotron.admin_server:main"
+memotron-local-platform = "memotron.local_platform:main"
+memotron-dream-worker = "memotron.worker:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.2.0",
+    # The `benchmark` extra is a DEV dependency as well as an optional one, for the same
+    # reason `otel` is below: four test modules score against the local official judge, and
+    # without nltk here they would fail on construction rather than exercise the metric.
+    "nltk>=3.9.2",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=6.0.0",
+    "coverage[toml]>=7.6.0",
+    # The `otel` extra is a DEV dependency as well as an optional one, so the telemetry
+    # code paths actually execute under test. Without it `observability/otel.py` measures
+    # ~20%: every branch past the `try: import opentelemetry` guard is unreachable, and a
+    # coverage floor set at that number would be a guard that cannot fail. Installing it
+    # here means the module is exercised rather than merely imported.
+    "opentelemetry-sdk>=1.27.0",
+    "opentelemetry-exporter-otlp-proto-http>=1.27.0",
+    "opentelemetry-instrumentation-asgi>=0.48b0",
+]
+lint = [
+    "diff-cover>=10.5.0",
+    "mypy>=1.18",
+    "ruff==0.15.14",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/memotron"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+# NOTE (pytest 9.0.3, measured 2026-08-27): `--strict-markers` HERE DOES NOT
+# ENFORCE. An unregistered mark still only warns. The identical flag passed on
+# the command line turns the same mark into a collection error. Reproduced with
+# addopts set to "--strict-markers" alone, with "--strict-config --strict-markers",
+# and with a plugin-ordering variant -- all three warn; the CLI form errors. The
+# flag is kept here so it starts working if that is fixed upstream, but the real
+# gate is `scripts/check.sh`, which passes it explicitly. Do not treat this line
+# as the guard.
+addopts = "--strict-markers --strict-config"
+markers = [
+    "postgres: needs a live Postgres via MEMOTRON_TEST_POSTGRES_DSN. Skipped, never silently passed, without one.",
+    "corpus: needs an official evaluation corpus via MEMOTRON_PUBLIC_CORPUS_DIR.",
+]
+# Deliberately NO `slow` marker. Measured 2026-08-27: the whole suite runs in
+# ~36s and the slowest single test is 2.18s, so a slow/fast split would be
+# ceremony that drifts. Revisit only if a test crosses ~10s.
+
+[tool.ruff]
+# 120, not ruff's default 88. Measured over all 68,784 source lines: p50=40,
+# p90=79, p95=85, p99=100, max=215. The codebase was written to a ~100-col
+# budget, so 88 would declare 2,391 existing lines wrong for no reason
+# (E501 counts: 88 -> 2391, 100 -> 628, 110 -> 184, 120 -> 43).
+line-length = 120
+target-version = "py312"
+src = ["src", "tests", "scripts"]
+extend-exclude = [".venv", "ui/admin", "benchmarks", "*.ipynb"]
+
+[tool.ruff.lint]
+# Tier 1: rules that find DEFECTS, not house style. `--select ALL` reports
+# 19,394 violations here, ~90% of which are E501/TRY003/EM101/COM812/D1xx --
+# a wall nobody drives to zero. This set is the achievable subset.
+# E1/E2/E3/E501 are deliberately absent so the linter never fights the
+# formatter, which is not run until after the module split (see [tool.ruff.format]).
+select = [
+    "F",                                # pyflakes -- the whole reason to do this
+    "E4", "E7", "E9", "W",              # pycodestyle, minus the formatter's territory
+    "I",                                # isort
+    "UP",                               # pyupgrade
+    "B",                                # bugbear
+    "C4", "PIE", "SIM", "RET", "FLY", "PERF",
+    "ISC", "LOG", "G",                  # implicit str concat; logging correctness
+    "PYI", "TID", "PT", "DTZ",
+    "T20", "A", "ARG", "S",             # print / builtin shadow / unused arg / bandit
+    "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",   # complexity -- see [tool.ruff.lint.mccabe]
+    "RUF",
+    # Enabled 2026-09-01, each measured at ZERO violations across `ruff check .` --
+    # which is the whole point. These cost nothing today and exist to stop the first
+    # instance, not to clean up after the hundredth. A family with no violations is
+    # the cheapest one to turn on and the only kind that can be turned on without a
+    # judgement call at every site.
+    #
+    #   RSE   raise Foo() not raise Foo          PGH   blanket noqa / type-ignore
+    #   Q     quote consistency                  INT   gettext f-string traps
+    #   SLOT  __slots__ on str/tuple subclasses  YTT   sys.version_info misuse
+    #   PLE   pylint ERRORS only (not R/C/W)     NPY   numpy legacy API
+    #   PD    pandas anti-patterns
+    #
+    # NPY and PD are here despite neither library being a dependency: they are free,
+    # and the point of a gate is to be in place BEFORE the code it guards exists.
+    "RSE", "PGH", "Q", "INT", "SLOT", "YTT", "PLE", "NPY", "PD",
+    # Enabled 2026-09-01 after clearing what they found, each its own small fix:
+    #   FURB  20 violations -> 0. 17 auto-fixed (re.I -> re.IGNORECASE; `x if x else y`
+    #         -> `x or y`). The other 3 were hand-checked: certification.py's
+    #         `fromisoformat(text.replace("Z", "+00:00"))` was redundant, not a bug --
+    #         requires-python is >=3.12 and fromisoformat has parsed `Z` since 3.11.
+    #   N818   3 -> 0. One real rename (`_RacedRegistration` -> `_RacedRegistrationError`,
+    #         private, 4 sites); the two in tests/ are per-file-ignored below.
+    "FURB", "N818",
+    #   ASYNC blocking I/O inside `async def`. ZERO in src/ -- all 12 live in
+    #         examples/, scripts/ and tests/, where the async-ness is incidental
+    #         (pytest-asyncio) and a blocking call to a local server is the clearer
+    #         test. Ignored there, so this gates the code that actually ships.
+    "ASYNC",
+]
+
+# --------------------------------------------------------------------- deferred
+# Measured 2026-09-01 and deliberately NOT enabled. Recorded so the next person does
+# not re-measure, and so the reason is arguable rather than assumed:
+#
+#   BLE001  63 violations -- 44 scripts/, 10 src/, 7 tests/, 2 other. The count is not
+#           why it is deferred. All TEN src/ instances are deliberate fault barriers:
+#           do_GET/do_POST converting to a 500, `_run_dream_sequence_worker` catching
+#           BaseException in a thread, `maintain_memory`'s daemon loop, `run_cycle`,
+#           `_try_enable_pgvector`'s feature probe, and one already annotated
+#           `# pragma: no cover - decode with replace cannot raise`. Enabling it yields
+#           10 `# noqa` comments and zero fixes. BLE001 cannot tell a fault barrier from
+#           a swallowed bug, and a rule whose only effect is annotating correct code
+#           trains people to add noqa without reading. Revisit if a real swallowed
+#           exception is ever traced to one of these sites.
+#
+#   TC      244 violations. Churn that would collide with every later refactor phase.
+ignore = [
+    # Em-dashes and typographic quotes are deliberate throughout the prose.
+    "RUF001", "RUF002", "RUF003",
+    # Bandit rules that are false here. Each is re-enabled per-file where it isn't.
+    "S101",                             # assert -- 4,822 hits, all in tests/
+    "S310",                             # urlopen -- every call site passes an explicit timeout
+    "S608",                             # SQL string build -- fixed literal table names only
+    "S603", "S607",                     # subprocess in scripts/ verification harnesses
+    "S104",                             # bind-all -- deliberate in local_platform/admin_server
+    # `object` is the third element of a subject/predicate/object triple -- the
+    # domain's own vocabulary and part of the public API, so it cannot be renamed.
+    # `format` is BaseHTTPRequestHandler.log_message's inherited signature.
+    "A002",
+    # Deferred to Tier 2 (see the table in docs; enable each as its own commit).
+    "ARG001", "ARG002",                 # several are protocol-conformance stubs
+    "T201",                             # cli.py and scripts/ legitimately print
+]
+
+[tool.ruff.lint.per-file-ignores]
+# N818: a test that raises `Boom` is naming the exception after its role in the test --
+# "some exception happens here". `BoomError` reads as a real error type and is worse.
+"tests/**" = ["S101", "S105", "S106", "SLF001", "PLR2004", "INP001", "ARG001", "ARG005", "PT018",
+               "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "N818", "ASYNC"]
+# scripts/, examples/ and demo/ are one-shot harnesses and runnable demos. None
+# of them ships: [tool.hatch.build.targets.wheel] packages only src/memotron.
+# They are held to the rules that find DEFECTS (F, B, RUF, DTZ, ...) and excused
+# from the ones that only make sense for long-lived library code:
+#   E701/E702  deliberately terse, single-screen probes
+#   S110/S112  a sweep RECORDS a failure in its report; raising would end the sweep
+#   SIM105     same containment, expressed as try/except so the reason can sit inline
+#   SIM115     short-lived scripts that exit right after writing their report
+#   PERF401    loop shape is the clearer read in a benchmark that is timing the loop
+#   B007/SIM113 loop-variable style in throwaway iteration
+"scripts/**" = [
+    "T201", "S101", "S108", "S311", "INP001", "E402", "E701", "E702",
+    "S110", "S112", "SIM105", "SIM115", "PERF401",
+    "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",
+    "ASYNC",
+]
+"examples/**" = ["T201", "INP001", "S110", "SIM105", "SIM115", "PERF401", "B007", "SIM113",
+                  "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "ASYNC"]
+"demo/**" = ["T201", "INP001", "S110", "SIM105", "PERF401",
+              "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915"]
+# patent/ draws the figures for the patent PDFs -- plotting scripts written in the
+# dense one-statement-per-semicolon style that style is conventional for.
+"patent/**" = ["T201", "INP001", "E402", "E701", "E702", "ISC001", "C408", "PERF401"]
+"src/memotron/__init__.py" = ["F401"]   # the package's re-export surface
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.flake8-pytest-style]
+# Narrowed from ruff's default list, which also names ValueError and OSError.
+# ValueError is this codebase's PRIMARY domain error -- config validation,
+# policy violations, malformed candidates and governance refusals all raise it --
+# so requiring `match=` on all 45 sites would mean pinning 45 assertions to
+# message text, which makes them brittle against reworded errors without making
+# them meaningfully stricter. `Exception`/`BaseException` stay required, because
+# those genuinely can pass on an unrelated failure; the one site that did that
+# is fixed rather than suppressed.
+raises-require-match-for = ["BaseException", "Exception"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["memotron"]
+# Guarantees every module the split extracts is born with it. 54 of 58 src files
+# already have it; without it an extracted file silently starts EVALUATING
+# annotations that used to be strings.
+required-imports = ["from __future__ import annotations"]
+
+# --------------------------------------------------------------------- complexity
+# A RATCHET, not a standard. Every threshold below is the exact maximum measured
+# across src/memotron on 2026-08-29, immediately after the last god-class split.
+# So nothing fails today and nothing may get worse -- which is the only honest way to
+# turn these on over a research PoC that has a 1,130-line function in it.
+#
+# These are not aspirational targets. They are a high-water mark, and the numbers are
+# left ugly on purpose so the ratchet reads as debt rather than as approval:
+#
+#   max-statements  191   dreaming/_materialization.py:82  (_materialize_episode)
+#   max-branches     39   dreaming/_materialization.py:82  (same function)
+#   max-complexity   38   config/_control_plane.py:81
+#   max-args         20   client/_ingest.py:46             (add_memory, keyword-only)
+#   max-returns      17   dreaming/_entities.py:553
+#
+# Phase 7 decomposes the god METHODS; each of these should come DOWN with its own
+# commit and a measurement, never up. Raising one needs a reason in the message.
+#
+# tests/, scripts/, examples/ and demo/ are exempted rather than measured: none of
+# them ships in the wheel, and letting a fixture set the ceiling for the library
+# would defeat the ratchet.
+[tool.ruff.lint.mccabe]
+max-complexity = 38
+
+[tool.ruff.lint.pylint]
+max-args = 20
+max-branches = 39
+max-returns = 17
+max-statements = 191
+
+[tool.ruff.format]
+# Run and GATED since 2026-08-29 (`format` lane in scripts/check.sh).
+#
+# It was deferred through the whole module split, because a formatter run mid-refactor
+# collides with every moved block. Actual blast radius when it finally ran: **243 files,
+# net -2,225 lines** -- the estimate recorded here while it was deferred said 138 files
+# and 7,434 lines, and it aged quietly for ~150 commits. The commit is recorded in
+# .git-blame-ignore-revs.
+#
+# Note for anyone verifying a future format commit: `pure_move.py` is the WRONG gate for
+# it and reports false failures, because CPython lays out comprehension jumps by source
+# line spread. Use `scripts/verify/ast_identity.py`, which compares the parsed tree.
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+docstring-code-format = false            # docstrings contain illustrative pseudo-code
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src/memotron"]
+mypy_path = "src"
+namespace_packages = true
+explicit_package_bases = true
+# 177 BaseModel subclasses across 13 files and 115 validators. Without the plugin
+# mypy synthesises `__init__(*args: Any, **kwargs: Any)` for every one of them, so
+# the single most valuable check on a 4,361-line policy schema -- did you pass the
+# right keyword -- does nothing at all.
+plugins = ["pydantic.mypy"]
+ignore_missing_imports = true
+
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+show_error_codes = true
+pretty = true
+
+# Off globally, on per module below. The point of this file is that `mypy` EXITS 0
+# today, so it is a real gate from the first commit rather than a wall of 298
+# errors nobody reads. Debt is recorded, not hidden: every entry in the lenient
+# tier names the module and the exact codes it still emits.
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+disallow_untyped_decorators = false
+disallow_any_generics = false
+warn_return_any = false
+no_implicit_reexport = false
+
+# Verified 2026-08-27: pydantic and mcp ship py.typed; these five do not.
+[[tool.mypy.overrides]]
+module = ["pyarrow.*", "nltk.*", "yaml.*", "psycopg.*", "psycopg_pool.*"]
+ignore_missing_imports = true
+
+# ---------------------------------------------------------------- STRICT TIER
+# 30 of 58 modules pass --strict TODAY, measured, including models.py (the leaf
+# every other module imports), storage/base.py, retrieval.py and crypto.py.
+# Every module the split extracts is BORN here. Adding a name to this list is
+# the definition of "that module's split is done".
+[[tool.mypy.overrides]]
+module = [
+    "memotron",
+    "memotron.adoption",
+    "memotron.agents",
+    "memotron.attestations",
+    # #251 caveman: every module name is listed UP FRONT, from the design
+    # document's module table, so the work packages that build them never need to
+    # touch this file and cannot collide here. A caveman module is born strict;
+    # there is no lenient-tier entry for any of them and none may be added.
+    #
+    # `lines` is gone with amendment D's sigil grammar -- its ordering and header
+    # logic moved to `render` as word-based equivalents -- and `render`, `replay`,
+    # `mcp` and `guidance` arrived with it.
+    "memotron.caveman",
+    "memotron.caveman.dream",
+    "memotron.caveman.errors",
+    "memotron.caveman.explain",
+    "memotron.caveman.extract",
+    "memotron.caveman.gateway",
+    "memotron.caveman.graph",
+    "memotron.caveman.guidance",
+    "memotron.caveman.ledger",
+    "memotron.caveman.llm",
+    "memotron.caveman.mcp",
+    "memotron.caveman.models",
+    "memotron.caveman.motive",
+    "memotron.caveman.pipeline",
+    "memotron.caveman.pressure",
+    "memotron.caveman.rank",
+    "memotron.caveman.read",
+    "memotron.caveman.receipts",
+    "memotron.caveman.reconcile",
+    "memotron.caveman.render",
+    "memotron.caveman.replay",
+    "memotron.caveman.seams",
+    "memotron.caveman.tokens",
+    "memotron.coherence",
+    "memotron.crypto",
+    "memotron.embedding",
+    "memotron.erasure",
+    "memotron.gateway",
+    "memotron.health",
+    "memotron.identity",
+    "memotron.interop",
+    "memotron.memory_bank",
+    "memotron.models",
+    "memotron.models._artifacts",
+    "memotron.models._coherence",
+    "memotron.models._enums",
+    "memotron.models._events",
+    "memotron.models._graph",
+    "memotron.models._health",
+    "memotron.models._mutations",
+    "memotron.models._results",
+    "memotron.models._runs",
+    "memotron.models._views",
+    "memotron.config._actionability",
+    "memotron.config._claim_mode",
+    "memotron.config._control_plane",
+    "memotron.config._governance",
+    "memotron.config._instructions",
+    "memotron.config._metadata",
+    "memotron.config._motive",
+    "memotron.config._predicates",
+    "memotron.config._prompts",
+    "memotron.config._retrieval",
+    "memotron.config._storage_env",
+    "memotron.config._tenancy",
+    "memotron.multimodal",
+    "memotron.platform_client",
+    "memotron.prompts",
+    "memotron.prompts.research_temporal",
+    "memotron.redaction",
+    "memotron.retrieval",
+    "memotron.runtime",
+    "memotron.session",
+    "memotron.storage",
+    "memotron.storage.base",
+    "memotron.storage.composite",
+    "memotron.storage.postgres._migrations",
+    "memotron.storage.receipts",
+    "memotron.storage.settings",
+    "memotron.synthesis",
+    "memotron.transcripts",
+    "memotron.agent_memory._bootstrap",
+    "memotron.agent_memory._builders",
+    "memotron.agent_memory._common",
+    "memotron.agent_memory._config",
+    "memotron.agent_memory._contract",
+    "memotron.agent_memory._curation",
+    "memotron.agent_memory._project",
+    "memotron.agent_memory._prompts",
+    "memotron.agent_memory._protocol",
+    "memotron.agent_memory._publish",
+    "memotron.agent_memory._registry",
+    "memotron.agent_memory._render",
+    "memotron.agent_memory._reporting",
+    "memotron.agent_memory._results",
+    "memotron.agent_memory._scopes",
+    "memotron.agent_memory._session",
+    "memotron.agent_memory._transcripts",
+    "memotron.config._dream_config",
+    "memotron.config._policies",
+    "memotron.dreaming._candidates",
+    "memotron.dreaming._common",
+    "memotron.dreaming._consolidation",
+    "memotron.dreaming._contradiction",
+    "memotron.dreaming._decisions",
+    "memotron.dreaming._dedup",
+    "memotron.dreaming._entities",
+    "memotron.dreaming._formation",
+    "memotron.dreaming._identity",
+    "memotron.dreaming._lifecycle",
+    "memotron.dreaming._materialization",
+    "memotron.dreaming._predicates",
+    "memotron.dreaming._protocol",
+    "memotron.dreaming._rollup_text",
+    "memotron.dreaming._rollups",
+    "memotron.dreaming._text",
+    "memotron.storage._shared._claims",
+    "memotron.storage._shared._governance",
+    "memotron.storage._shared._graph",
+    "memotron.storage._shared._projection",
+    "memotron.storage._shared._protocol",
+    "memotron.storage._shared._rows",
+    "memotron.storage.postgres._artifacts",
+    "memotron.storage.postgres._engine",
+    "memotron.storage.postgres._epochs",
+    "memotron.storage.postgres._governance",
+    "memotron.storage.postgres._graph",
+    "memotron.storage.postgres._operational",
+    "memotron.storage.postgres._policy",
+    "memotron.storage.postgres._protocol",
+    "memotron.storage.postgres._receipts",
+    "memotron.storage.sqlite._artifacts",
+    "memotron.storage.sqlite._epochs",
+    "memotron.storage.sqlite._governance",
+    "memotron.storage.sqlite._graph",
+    "memotron.storage.sqlite._migrations",
+    "memotron.storage.sqlite._operational",
+    "memotron.storage.sqlite._policy",
+    "memotron.storage.sqlite._protocol",
+    "memotron.client._archive",
+    "memotron.client._artifacts",
+    "memotron.client._certification",
+    "memotron.client._common",
+    "memotron.client._crypto",
+    "memotron.client._governance",
+    "memotron.client._ingest",
+    "memotron.client._lifecycle",
+    "memotron.client._outcomes",
+    "memotron.client._profile",
+    "memotron.client._protocol",
+    "memotron.client._retrieval",
+    "memotron.client._runtime",
+    "memotron.client._timeline",
+    "memotron.client._views",
+]
+# NOT `strict = true`. MEASURED TRAP (mypy 2.3.1, 2026-08-27): `strict` inside a
+# per-module override is applied PROJECT-WIDE and silently -- no warning. A/B on
+# this exact file: with `strict = true` here, 298 errors in 28 files; with it
+# removed, 211 in 20. It looks per-module and is not. `strict` is shorthand for
+# the flags below, and THOSE are genuinely per-module, so they are spelled out.
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+disallow_subclassing_any = true
+disallow_any_generics = true
+warn_return_any = true
+no_implicit_reexport = true
+strict_equality = true
+extra_checks = true
+
+
+# ---------------------------------------------------------------- LENIENT TIER
+# DEBT, recorded rather than hidden. Each entry names a module and the exact
+# codes it still emits (211 errors across 20 modules, measured 2026-08-27).
+# Deleting a code from a list is the unit of progress; deleting a whole block
+# and adding the module to the strict tier above is what 'done' looks like.
+# The concentration is the point: 4 modules carry 168 of the 211, and they are
+# exactly the 4 the module split targets.
+
+[[tool.mypy.overrides]]  # 44
+module = "memotron.dreaming"
+disable_error_code = ["arg-type", "attr-defined"]
+
+# These two carry TARGETED `# type: ignore[...]` comments for the same codes the
+# blanket list above disables, so mypy calls the ignores redundant. They are kept:
+# a precise suppression is better than a module-wide one, and each becomes load-
+# bearing again the moment its code is retired from the list above. Only the
+# redundancy warning is switched off, and only here.
+warn_unused_ignores = false
+
+# Each mixin the split lands narrows that list of 9 for the code it takes with it.
+# _lifecycle needs 2, and both are type-NARROWING limits rather than defects:
+#   arg-type      float(components["retention_value"]) -- the retention component
+#                 dict is dict[str, object] and the value is a float at runtime;
+#                 and len()/join() on episode_uuids, which is guarded by an
+#                 `isinstance(..., list)` folded into a `recoverable` bool that
+#                 mypy cannot narrow through.
+#   attr-defined  one local typed `object` reaching .created_at.
+# All three are one-line fixes -- and all three would edit a moved body, which
+# forfeits pure_move on this commit for no safety gain. They belong to Phase 5,
+# after the last extraction, when bodies are editable again.
+[[tool.mypy.overrides]]
+module = "memotron.dreaming._lifecycle"
+disable_error_code = ["arg-type", "attr-defined", "no-any-return"]
+
+# _contradiction needs 1 of the 9: open_json() called with a property read out of
+# a dict[str, Any], so mypy sees `Any | None` where the caller has already
+# established it is a str. Same Phase 5 note as above -- fixing it edits a moved
+# body.
+[[tool.mypy.overrides]]
+module = "memotron.dreaming._contradiction"
+disable_error_code = ["arg-type"]
+
+# _materialization needs 2 of the 9, and both are the SAME shape: a
+# `MemoryType | None` or `GraphRelationship | None` that the surrounding control
+# flow has already established is not None, across a 1,130-line body mypy will not
+# narrow through. Nine union-attr and one arg-type, all of it that one pattern.
+# Not fixable here for the reason the module docstring gives: touching the body
+# forfeits pure_move on the riskiest code in the package. Phase 5.
+[[tool.mypy.overrides]]
+module = "memotron.dreaming._materialization"
+disable_error_code = ["arg-type", "union-attr"]
+
+# _entities needs 2 of the 9, from two mirrored call sites (:322/:327 and
+# :434/:439) that read a score and a signal map out of a dict[str, object].
+[[tool.mypy.overrides]]
+module = "memotron.dreaming._entities"
+disable_error_code = ["arg-type", "call-overload"]
+
+# _predicates needs 1 of the 9: register_predicate(decided_by=...) reached with a
+# `str | None` the caller has already defaulted.
+[[tool.mypy.overrides]]
+module = "memotron.dreaming._predicates"
+disable_error_code = ["arg-type"]
+
+# _decisions needs 1 of the 9. One of its two sites is worth naming: :247 passes
+# **dict[str, object] into _emit_receipt, whose **fields parameter absorbs it at
+# runtime but which mypy matches positionally against `episode`. That is a
+# limitation of expressing the receipt-field bag as **kwargs, not a call error --
+# and it is a good argument for giving _emit_receipt a TypedDict in Phase 5.
+[[tool.mypy.overrides]]
+module = "memotron.dreaming._decisions"
+disable_error_code = ["arg-type", "no-any-return"]
+
+# _rollups needs 5 of the 9 -- the widest of any mixin, and that is informative
+# rather than sloppy. A rollup is derived from a cluster whose members are read out
+# of the graph as `X | None`, then compared, aggregated and max()'d; every one of
+# these is that Optional surviving a step mypy will not narrow across
+# (cosine_similarity on an embedding, max() over `datetime | None` bounds,
+# .identifier on an optional synthesis transport). Fixing them means giving the
+# cluster read a real type, which is Phase 5 work and a genuine improvement rather
+# than an annotation shuffle.
+[[tool.mypy.overrides]]
+module = "memotron.dreaming._rollups"
+disable_error_code = ["arg-type", "operator", "return-value", "type-var", "union-attr"]
+
+[[tool.mypy.overrides]]
+module = "memotron.dreaming._dedup"
+disable_error_code = ["arg-type", "misc"]
+
+# _consolidation needs 1 of the 9. Its two attr-defined errors were NOT suppressed:
+# they were the two measured cross-edges into _dedup and _rollups, and they are
+# declared in _protocol.py instead, where a third one appearing is visible.
+[[tool.mypy.overrides]]
+module = "memotron.dreaming._consolidation"
+disable_error_code = ["arg-type"]
+
+# _formation needs 3 of the 9. Three of its five errors trace to ONE cause worth
+# naming rather than burying: _effective_prompt_profile is annotated `-> object`,
+# so every downstream use of a prompt profile is untyped. That annotation is
+# pre-existing and giving it its real return type is a contained Phase 5 fix that
+# would retire most of this entry.
+[[tool.mypy.overrides]]
+module = "memotron.dreaming._formation"
+disable_error_code = ["arg-type", "assignment", "attr-defined"]
+
+[[tool.mypy.overrides]]  # 42
+module = "memotron.mcp_server"
+disable_error_code = ["arg-type"]
+
+# These two carry TARGETED `# type: ignore[...]` comments for the same codes the
+# blanket list above disables, so mypy calls the ignores redundant. They are kept:
+# a precise suppression is better than a module-wide one, and each becomes load-
+# bearing again the moment its code is retired from the list above. Only the
+# redundancy warning is switched off, and only here.
+warn_unused_ignores = false
+
+# _motive inherits ONE of the parent's four codes: a sort key read out of a
+# dict[str, object] and negated. The other three stayed behind with the handler.
+[[tool.mypy.overrides]]
+module = "memotron.admin_server._motive"
+disable_error_code = ["operator"]
+
+# client.py -> client/ : 8,914 lines into a composer plus 13 mixins.
+#
+# The composer went from a 10-code blanket to ONE code. That is not a tidy-up: the
+# blanket was hiding whatever the other nine codes would have caught anywhere in
+# 8,914 lines, and the only way to shrink it was to move code out from under it.
+# _protocol.py does the same job here it does for storage/postgres and storage/sqlite
+# -- it declares the composed surface so a mixin's `self.<other mixin's method>` is a
+# checked call rather than an unchecked one.
+#
+# Every code below is pre-existing debt that came across with its method, named per
+# module so it can be paid off one line at a time. Two clusters dominate:
+#
+#   no-any-return (31)   the strict tier is new for these modules, and it is the
+#                        first thing that notices a function annotated `-> str`
+#                        returning out of a dict[str, Any]. Phase 7 item 2.
+#   no-untyped-def (8)   five are in _protocol, generated to mirror five genuinely
+#                        unannotated methods. Annotating the originals would change
+#                        their public signature and therefore the api_surface golden,
+#                        which does not belong in a pure-move commit.
+[[tool.mypy.overrides]]  # 1, was 22
+module = "memotron.client"
+disable_error_code = ["arg-type"]
+
+[[tool.mypy.overrides]]  # 6
+module = "memotron.client._archive"
+disable_error_code = ["arg-type", "attr-defined", "func-returns-value", "list-item", "return-value"]
+
+[[tool.mypy.overrides]]  # 3
+module = "memotron.client._certification"
+disable_error_code = ["arg-type"]
+
+[[tool.mypy.overrides]]  # 3
+module = "memotron.client._crypto"
+disable_error_code = ["no-any-return"]
+
+[[tool.mypy.overrides]]  # 1
+module = "memotron.client._ingest"
+disable_error_code = ["arg-type"]
+
+[[tool.mypy.overrides]]  # 4
+module = "memotron.client._lifecycle"
+disable_error_code = ["arg-type", "no-any-return"]
+
+[[tool.mypy.overrides]]  # 8
+module = "memotron.client._outcomes"
+disable_error_code = ["no-untyped-def"]
+
+[[tool.mypy.overrides]]  # 5
+module = "memotron.client._protocol"
+disable_error_code = ["no-untyped-def"]
+
+[[tool.mypy.overrides]]  # 4
+module = "memotron.client._retrieval"
+disable_error_code = ["assignment", "call-overload", "index"]
+
+[[tool.mypy.overrides]]  # 14
+module = "memotron.client._runtime"
+disable_error_code = ["arg-type", "no-untyped-def", "operator"]
+
+[[tool.mypy.overrides]]  # 1
+module = "memotron.client._views"
+disable_error_code = ["assignment"]
+
+
+[[tool.mypy.overrides]]  # 7
+module = "memotron.certification"
+disable_error_code = ["arg-type", "union-attr"]
+
+# Shared planes (storage/_shared). Both engines' mixins delegate here, so this is
+# the one place where a suppression would be paid for TWICE. It carries exactly one
+# code, and deliberately NOT `attr-defined`:
+#
+#   arg-type   MemoryScope(kind=<str>) should be ScopeKind -- the identical
+#              pre-existing debt already named on _artifacts/_epochs/_graph, which
+#              moved with the code rather than being introduced by it.
+#
+# `attr-defined` is what would catch a `SharedPlaneBackend` Protocol member being
+# called that a backend does not provide -- the single check this whole extraction
+# most depends on. The eight errors that tempted a module-wide suppression were
+# seven-plus-one: seven from ONE local reused for `UseEvent` and `OutcomeEvent`
+# across the two branches of one `if`, and that local has been split (see the
+# comment in _projection.py). Verified 2026-09-01: removing `attr-defined` from
+# this block reports nothing.
+[[tool.mypy.overrides]]  # 1
+module = "memotron.storage._shared._projection"
+disable_error_code = ["arg-type"]
+
+# Postgres mixins. Same story as the SQLite block below: one blanket
+# disable_error_code across all six, replaced by storage/postgres/_protocol.py
+# declaring the composed surface. 26 errors -> 13, and every survivor is
+# pre-existing debt that predates the mixin structure entirely:
+#
+#   MemoryScope(kind=<str>)         should be ScopeKind   _artifacts/_epochs/_operational
+#   UseEvent.outcome_id/judged_at   the event models diverge      _operational
+#   UseEvent vs OutcomeEvent        one list holds both           _operational
+#   psycopg row-factory assignment  driver generics               _engine
+#   ReceiptLedger._rows override    return type narrowed          _receipts
+#
+# The Protocol is separate from the SQLite one on purpose: the backends share a
+# CONTRACT (StorageBackend) but not an implementation surface -- _engine and a
+# pooled transaction here, _connection and one sqlite3.Connection there. A single
+# Protocol would have to widen every member to Any, which is the blanket again
+# wearing an annotation.
+[[tool.mypy.overrides]]  # 1 each
+module = [
+    "memotron.storage.postgres._artifacts",
+    "memotron.storage.postgres._epochs",
+]
+disable_error_code = ["arg-type"]
+
+[[tool.mypy.overrides]]  # 1: psycopg row-factory generics
+module = "memotron.storage.postgres._engine"
+disable_error_code = ["assignment", "no-any-return"]
+
+[[tool.mypy.overrides]]  # 1: _rows narrows the ReceiptLedger return type
+module = "memotron.storage.postgres._receipts"
+disable_error_code = ["override"]
+
+# Was ["arg-type", "assignment", "attr-defined", "no-any-return"] / 9 errors. The
+# shared-plane extraction moved the `UseEvent.outcome_id/judged_at` and
+# `UseEvent vs OutcomeEvent` bodies out to storage/_shared/_projection.py, so
+# `assignment` and `attr-defined` stopped firing here entirely (mypy_suppressions.py
+# reported both as retired). Deleted rather than left: a suppression nothing produces
+# is a category mypy silently ignores in the module most likely to be edited next.
+[[tool.mypy.overrides]]  # 1
+module = "memotron.storage.postgres._operational"
+disable_error_code = ["arg-type", "no-any-return"]
+
+# SQLite mixins. These were ONE blanket entry disabling attr-defined across all
+# seven -- 200 suppressed errors, which also suppressed any real attribute typo in
+# 5,700 lines of storage code. storage/sqlite/_protocol.py replaced the blanket
+# with a declaration of what the composed backend provides, taking those 200 down
+# to 12. What is left is genuine pre-existing debt, named per module and per code
+# so it can be paid off one line at a time:
+#
+#   MemoryScope(kind=<str>)      should be ScopeKind        _artifacts/_epochs/_graph/_operational
+#   UseEvent.outcome_id/judged_at  the event models diverge   _operational
+#   UseEvent vs OutcomeEvent       one list holds both        _operational
+#   ScopeStateHashTracker(self)    typed against the concrete class, not the mixin
+#
+# None of these is caused by the split; all four predate it and moved with the code.
+[[tool.mypy.overrides]]  # 1 each
+module = [
+    "memotron.storage.sqlite._artifacts",
+    "memotron.storage.sqlite._epochs",
+]
+disable_error_code = ["arg-type"]
+
+[[tool.mypy.overrides]]  # 1: ScopeStateHashTracker(self) wants the composed class
+module = "memotron.storage.sqlite._graph"
+disable_error_code = ["arg-type"]
+
+# Was ["arg-type", "assignment", "attr-defined"] / 9 errors, retired for the same
+# reason as the Postgres twin above: the bodies that produced `assignment` and
+# `attr-defined` now live in storage/_shared/_projection.py, where the reused-local
+# that caused them has been SPLIT rather than suppressed.
+[[tool.mypy.overrides]]  # 1
+module = "memotron.storage.sqlite._operational"
+disable_error_code = ["arg-type"]
+
+# SQLite concern mixins, same shape and same reason as the Postgres ones above:
+# a mixin calls shared helpers (_commit, _json_dumps, _datetime_to_text, ...) that
+# live on the COMPOSED class, per R-A2 -- a helper used by more than one mixin is
+# not duplicated into each. mypy checks a mixin in isolation and cannot see them.
+#
+# The real fix is one shared Protocol describing the composed surface, which would
+# retire these entries AND the six Postgres ones in a single change. Deliberately
+# deferred: the split contract is "moved, unchanged", and adding a Protocol base to
+# every mixin is neither. Reserved as storage/_protocol.py for the typing pass.
+
+# The split inherits its parent's single disabled code, narrowed to the two mixins
+# that need it. Both are the same shape: a `str | MemoryType` reaching an API that
+# wants the enum, where the caller has already normalised it.
+# Split from one shared block 2026-08-30: `_project` no longer needs `no-any-return`
+# and `_publish` still does, so sharing an entry would have kept a dead suppression
+# alive on one of them. Two single-module blocks, never overlapping -- a module listed
+# in two override blocks with different disable_error_code makes mypy fail with
+# "Missing target module, package, files, or command", which names the wrong cause.
+[[tool.mypy.overrides]]
+module = "memotron.agent_memory._publish"
+disable_error_code = ["arg-type", "no-any-return"]
+
+[[tool.mypy.overrides]]
+module = "memotron.agent_memory._project"
+disable_error_code = ["arg-type"]
+
+[[tool.mypy.overrides]]  # 2
+module = "memotron.context"
+disable_error_code = ["assignment", "var-annotated"]
+
+[[tool.mypy.overrides]]  # 1
+module = "memotron.cli"
+disable_error_code = ["arg-type"]
+
+# The single arg-type in config.py MOVED here with the split -- dict is
+# invariant, so a dict[str, MetadataFilterValue] is not a dict[str, object].
+# The real fix is to widen metadata_matches_filter to Mapping[str, object],
+# but that edits an annotation, which is a content change pure_move would
+# rightly flag mid-split. The debt follows the code; fix it after the split.
+[[tool.mypy.overrides]]  # 1
+module = "memotron.config._policies"
+disable_error_code = ["arg-type"]
+
+# _dream_config.py:331 annotates `episode_metadata: dict` with no type args.
+# Pre-existing -- it lived under config.py's lenient entry and only surfaced when
+# the module was proposed for the strict tier. Adding the args is a one-line fix
+# and a content change, so it waits for the post-split typing pass rather than
+# riding along in a commit whose contract is "moved, unchanged".
+[[tool.mypy.overrides]]  # 1
+module = "memotron.config._dream_config"
+disable_error_code = ["type-arg"]
+
+[[tool.mypy.overrides]]  # 1
+module = "memotron.extraction"
+disable_error_code = ["arg-type"]
+
+[[tool.mypy.overrides]]  # 1
+module = "memotron.storage.factory"
+disable_error_code = ["return-value"]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+[tool.coverage.run]
+source_pkgs = ["memotron"]
+# Statement coverage only, deliberately. Branch coverage is strictly better but
+# it moves every number down at once, and the floors below are the safety net for
+# the module split -- they have to be trustworthy from the first commit. Turn
+# `branch` on as its own commit once the split has landed, and re-baseline then.
+branch = false
+parallel = true
+# Required for diff-cover, and so a report produced inside the Harness container
+# matches one produced on a laptop.
+relative_files = true
+omit = ["*/prompts/*"]
+
+[tool.coverage.paths]
+source = ["src/memotron", "*/site-packages/memotron", "/harness/src/memotron"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+precision = 1
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "@(abc\\.)?abstractmethod",
+    "if __name__ == .__main__.:",
+    "class .*\\(Protocol\\):",
+]
+
+[tool.coverage.html]
+directory = ".coverage-html"
+
+# The strict tier grew 23 -> 75 modules when the split's output was finally added to
+# it. The residue is ONE shape: a function returning what an untyped dependency handed
+# back. Not sloppiness, and not fixable inside these files.
+#
+#   storage/*       psycopg row access is Any. Typing that boundary belongs with the
+#                   Postgres work, not here.
+#   agent_memory/*  every one returns `await self.client.<method>(...)`, and
+#                   memotron.client is still lenient -- so the return IS Any and no
+#                   annotation in these files can change it.
+#
+# That second group is the finding: the typing ratchet is blocked at exactly the
+# boundary the module graph is. agent_memory cannot be strict until client.py is,
+# which puts client.py's TYPING on the cutover's critical path, not just its split.
+# Each entry retires when its dependency is typed. That is the ratchet.
+[[tool.mypy.overrides]]
+module = "memotron.agent_memory._bootstrap"
+disable_error_code = ["no-any-return"]
+
+[[tool.mypy.overrides]]
+module = "memotron.agent_memory._curation"
+disable_error_code = ["no-untyped-def"]
+
+[[tool.mypy.overrides]]
+module = "memotron.agent_memory._prompts"
+disable_error_code = ["no-any-return"]
+
+[[tool.mypy.overrides]]
+module = "memotron.agent_memory._registry"
+disable_error_code = ["no-any-return"]
+
+[[tool.mypy.overrides]]
+module = "memotron.agent_memory._reporting"
+disable_error_code = ["no-any-return"]
+
+[[tool.mypy.overrides]]
+module = "memotron.agent_memory._session"
+disable_error_code = ["no-any-return"]
+
+[[tool.mypy.overrides]]
+module = "memotron.storage.postgres._governance"
+disable_error_code = ["no-any-return"]
+
+[[tool.mypy.overrides]]
+module = "memotron.storage.postgres._graph"
+disable_error_code = ["no-any-return"]
+
+[[tool.mypy.overrides]]
+module = "memotron.storage.postgres._policy"
+disable_error_code = ["no-any-return"]
+
+[[tool.mypy.overrides]]
+module = "memotron.storage.sqlite._governance"
+disable_error_code = ["no-any-return"]

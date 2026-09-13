@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "memotron_agent_memory": {
+      "alwaysLoad": true,
+      "args": [
+        "mcp",
+        "--project-root",
+        "${CLAUDE_PROJECT_DIR:-.}"
+      ],
+      "command": "memotron",
+      "type": "stdio"
+    }
+  }
+}

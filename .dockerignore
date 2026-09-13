@@ -1,0 +1,13 @@
+.env
+.git
+.gitignore
+.venv
+.memotron
+.pytest_cache
+__pycache__
+*.py[cod]
+.DS_Store
+.harness
+.helm
+NEXT.md
+tests

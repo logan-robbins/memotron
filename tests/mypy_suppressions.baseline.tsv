@@ -1,0 +1,88 @@
+# How many mypy errors each (module, disable_error_code) pair is currently hiding.
+# A RISE fails the gate: see scripts/verify/mypy_suppressions.py and #135. A FALL is
+# good news and is reported, not failed -- re-bless in the commit that paid the debt.
+#
+# Do not hand-edit to make a red run green. Regenerate:
+#     uv run python scripts/verify/mypy_suppressions.py --bless
+#
+# module	code	hidden_error_count
+memotron.admin_server._motive	operator	1
+memotron.agent_memory._bootstrap	no-any-return	6
+memotron.agent_memory._curation	no-untyped-def	6
+memotron.agent_memory._project	arg-type	2
+memotron.agent_memory._prompts	no-any-return	2
+memotron.agent_memory._publish	arg-type	1
+memotron.agent_memory._publish	no-any-return	2
+memotron.agent_memory._registry	no-any-return	2
+memotron.agent_memory._reporting	no-any-return	1
+memotron.agent_memory._session	no-any-return	1
+memotron.certification	arg-type	4
+memotron.certification	union-attr	3
+memotron.cli	arg-type	1
+memotron.client	arg-type	1
+memotron.client._archive	arg-type	1
+memotron.client._archive	attr-defined	1
+memotron.client._archive	func-returns-value	2
+memotron.client._archive	list-item	1
+memotron.client._archive	return-value	1
+memotron.client._certification	arg-type	3
+memotron.client._crypto	no-any-return	2
+memotron.client._ingest	arg-type	1
+memotron.client._lifecycle	arg-type	1
+memotron.client._lifecycle	no-any-return	2
+memotron.client._outcomes	no-untyped-def	1
+memotron.client._protocol	no-untyped-def	5
+memotron.client._retrieval	assignment	2
+memotron.client._retrieval	call-overload	1
+memotron.client._retrieval	index	1
+memotron.client._runtime	arg-type	1
+memotron.client._runtime	no-untyped-def	1
+memotron.client._runtime	operator	1
+memotron.client._views	assignment	1
+memotron.config._dream_config	type-arg	1
+memotron.config._policies	arg-type	1
+memotron.context	assignment	1
+memotron.context	var-annotated	1
+memotron.dreaming	arg-type	1
+memotron.dreaming	attr-defined	1
+memotron.dreaming._consolidation	arg-type	2
+memotron.dreaming._contradiction	arg-type	1
+memotron.dreaming._decisions	arg-type	2
+memotron.dreaming._decisions	no-any-return	1
+memotron.dreaming._dedup	arg-type	2
+memotron.dreaming._dedup	misc	1
+memotron.dreaming._entities	arg-type	2
+memotron.dreaming._entities	call-overload	2
+memotron.dreaming._formation	arg-type	3
+memotron.dreaming._formation	assignment	1
+memotron.dreaming._formation	attr-defined	3
+memotron.dreaming._lifecycle	arg-type	4
+memotron.dreaming._lifecycle	attr-defined	1
+memotron.dreaming._lifecycle	no-any-return	1
+memotron.dreaming._materialization	arg-type	1
+memotron.dreaming._materialization	union-attr	9
+memotron.dreaming._predicates	arg-type	1
+memotron.dreaming._rollups	arg-type	2
+memotron.dreaming._rollups	operator	3
+memotron.dreaming._rollups	return-value	1
+memotron.dreaming._rollups	type-var	1
+memotron.dreaming._rollups	union-attr	2
+memotron.extraction	arg-type	1
+memotron.mcp_server	arg-type	14
+memotron.storage._shared._projection	arg-type	1
+memotron.storage.factory	return-value	1
+memotron.storage.postgres._artifacts	arg-type	1
+memotron.storage.postgres._engine	assignment	1
+memotron.storage.postgres._engine	no-any-return	3
+memotron.storage.postgres._epochs	arg-type	1
+memotron.storage.postgres._governance	no-any-return	7
+memotron.storage.postgres._graph	no-any-return	4
+memotron.storage.postgres._operational	arg-type	1
+memotron.storage.postgres._operational	no-any-return	1
+memotron.storage.postgres._policy	no-any-return	1
+memotron.storage.postgres._receipts	override	1
+memotron.storage.sqlite._artifacts	arg-type	1
+memotron.storage.sqlite._epochs	arg-type	1
+memotron.storage.sqlite._governance	no-any-return	2
+memotron.storage.sqlite._graph	arg-type	1
+memotron.storage.sqlite._operational	arg-type	1

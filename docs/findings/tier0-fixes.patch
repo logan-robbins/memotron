@@ -1,0 +1,65 @@
+diff --git a/src/memotron/agent_memory.py b/src/memotron/agent_memory.py
+index 8bf8b69..3e370d7 100644
+--- a/src/memotron/agent_memory.py
++++ b/src/memotron/agent_memory.py
+@@ -25,6 +25,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
+ from memotron.agents import DreamAgentTransport
+ from memotron.client import Memotron
+ from memotron.config import (
++    storage_settings_from_env,
+     AgentMemoryPolicy,
+     DreamAgentConfig,
+     DreamConfig,
+@@ -515,6 +516,7 @@ def agent_memory_config() -> DreamConfig:
+     return DreamConfig(
+         instruction_sets=(instructions,),
+         memory_bank=agent_memory_bank(),
++        storage=storage_settings_from_env(),
+         jobs=(
+             DreamJob(
+                 name="formation-default",
+diff --git a/src/memotron/storage/postgres/__init__.py b/src/memotron/storage/postgres/__init__.py
+index 0fca6c2..0c8f887 100644
+--- a/src/memotron/storage/postgres/__init__.py
++++ b/src/memotron/storage/postgres/__init__.py
+@@ -39,6 +39,8 @@ Conventions for anything added to this package
+ 
+ from __future__ import annotations
+ 
++import os
++
+ from collections.abc import Iterable, Iterator
+ from contextlib import contextmanager
+ import logging
+@@ -110,6 +112,18 @@ class PostgresStorageBackend(
+         self._memory_graph: MemoryGraphStorage = (
+             memory_graph if memory_graph is not None else self
+         )
++        if key_manager is None and os.environ.get(
++            "MEMOTRON_ALLOW_EPHEMERAL_KEK", ""
++        ).strip().lower() not in {"1", "true", "yes"}:
++            # T0-2 fail-closed guard: an ephemeral KEK is random per process, so a
++            # Postgres store sealed by this process is unreadable after any restart,
++            # and the failure is silent. Refuse rather than shred quietly.
++            raise ValueError(
++                "refusing to build a Postgres storage backend with an ephemeral KEK: "
++                "sealed content would be unreadable after any restart and by every other "
++                "replica. Pass an explicit key_manager, or set "
++                "MEMOTRON_ALLOW_EPHEMERAL_KEK=1 for local/dev and tests."
++            )
+         self.key_manager: KeyManager = (
+             key_manager if key_manager is not None else LocalKeyManager.ephemeral()
+         )
+diff --git a/src/memotron/storage/postgres/_graph.py b/src/memotron/storage/postgres/_graph.py
+index 8dd2e94..193067c 100644
+--- a/src/memotron/storage/postgres/_graph.py
++++ b/src/memotron/storage/postgres/_graph.py
+@@ -377,7 +377,7 @@ class GraphPlaneMixin:
+         rows = self._engine.fetchall(
+             """
+             SELECT * FROM relationships
+-            WHERE properties->>'scope_key' = %s
++            WHERE properties->>'scope_key' = %s AND type <> 'MENTIONS'
+             ORDER BY created_at, uuid
+             """,
+             (scope_key,),

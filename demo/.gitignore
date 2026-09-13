@@ -1,0 +1,4 @@
+workspace/
+snapshots/*.json
+.memotron/
+__pycache__/

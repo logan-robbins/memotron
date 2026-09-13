@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Resolve a `memotron` CLI without requiring a separate `uv tool install`
+# step before the plugin's MCP server / hooks can run. Spike-only: see
+# docs/spikes/claude-plugin/memotron-plugin-spike.html for the bootstrap
+# risk this shim is standing in for (internal package index reachability).
+set -euo pipefail
+
+if command -v memotron >/dev/null 2>&1; then
+  exec memotron "$@"
+fi
+
+if command -v uv >/dev/null 2>&1; then
+  exec uv tool run --from jedai-memotron memotron "$@"
+fi
+
+echo "memotron-run: neither 'memotron' nor 'uv' found on PATH" >&2
+exit 1

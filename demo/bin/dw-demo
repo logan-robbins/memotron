@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Demo-only Memotron launcher.
+#
+# Runs the repository's own `memotron` CLI out of the repo virtualenv, via
+# demo/dw_shim.py, which swaps the dream-agent DECISION transport for the
+# deterministic LocalDreamAgentTransport.  See demo/dw_shim.py for why.
+#
+# The demo workspace's .mcp.json and .claude/settings.json hooks point here
+# instead of at a PATH-installed `memotron`.
+set -euo pipefail
+
+DEMO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$DEMO_DIR/.." && pwd)"
+PYTHON="$REPO_ROOT/.venv/bin/python"
+
+if [[ ! -x "$PYTHON" ]]; then
+  echo "dw-demo: missing $PYTHON — run 'uv sync' in $REPO_ROOT first" >&2
+  exit 1
+fi
+
+# Memotron reads .env relative to the process CWD; hooks and the MCP server
+# are launched from the demo workspace, so point the process at the repo root
+# where the gitignored .env with LITELLM_API_KEY lives.  Values are never
+# printed — only the variable name appears anywhere in this kit.
+cd "$REPO_ROOT"
+
+exec "$PYTHON" "$DEMO_DIR/dw_shim.py" "$@"

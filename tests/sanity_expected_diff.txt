@@ -1,0 +1,17 @@
+# Behaviour this branch changes ON PURPOSE, relative to `takeover`.
+#
+# scripts/verify/sanity.sh diffs a wheel built here against one built from the
+# baseline. Any difference is a finding. A finding that has been explained belongs
+# here, with the reason and the commit -- so the harness keeps reporting real drift
+# instead of becoming a check everyone knows is red.
+#
+# Format: one substring per line. A diff line matching any of these is expected.
+# Keep this SHORT. A long list means the baseline has drifted too far to be useful
+# and should be re-pointed at a newer tag.
+
+# memory_restore was implemented, advertised in AGENT_MEMORY_REQUIRED_TOOLS, and
+# missing its @mcp.tool() decorator -- so 28 tool-shaped functions registered 27
+# tools and the tool was unreachable over the protocol. sanity.sh is what found it,
+# by counting, on both wheels. Fixed with a registration test in both directions.
+mcp agent-memory 27 tools
+mcp agent-memory 28 tools

@@ -1,0 +1,71 @@
+version: 1
+mode: simple
+project:
+  id: memotron-dogfood
+  name: Memotron (dogfood)
+caller:
+  id: claude-code
+  name: Claude Code
+storage:
+  graph_path: .memotron/dogfood.sqlite
+agent_guidance:
+  cadence: event-driven
+  search_when:
+  - At the start of a new task or topic, and after context compaction.
+  - When prior requirements, decisions, incidents, preferences, or handoff state could
+    affect the work.
+  - When current evidence appears to conflict with remembered state.
+  remember_when:
+  - The user explicitly states or confirms a durable personal preference or constraint.
+  - A stable user-level fact will predictably change behavior in future repositories.
+  publish_when:
+  - A requirement or acceptance criterion is confirmed or changed.
+  - An architectural or operating decision is chosen with rationale.
+  - A serious incident, validated root cause, or durable mitigation is established.
+  - A blocker or handoff state is likely to matter in a later project session.
+  review_when:
+  - After a user confirmation or correction.
+  - After tests or production evidence validate or refute an important claim.
+  - At a meaningful task milestone, before handoff, or before task completion.
+  refresh_when:
+  - After a meaningful batch must be available to another agent or session immediately.
+  - Otherwise rely on the installed compaction and session-end hooks.
+llm:
+  provider: litellm
+  model: claude-haiku-4-5
+  base_url: https://latest.jedai-gateway.wdprapps.disney.com/v1
+  api_key_env: LITELLM_API_KEY
+project_memory:
+  project_goal: 'Productionize Memotron for JEDAI GKE: CI gate, durable Postgres
+    store, auth, dream worker.'
+  memory_goal: Preserve the current shared understanding needed to make correct engineering
+    decisions in this repository.
+  keep:
+  - Current requirements, architectural decisions, and operating constraints.
+  - Serious incidents, regressions, security concerns, and their mitigations.
+  - Current project state and blockers that will matter in a later session.
+  exclude:
+  - Secrets, credentials, tokens, and private personal data.
+  - Transient command output, scratch work, and facts already obvious from the repository.
+  - Unverified model speculation presented without source evidence.
+  rules:
+  - Prefer the newest adequately authoritative fact while preserving supersession
+    history.
+  - Do not let temporary state silently override a serious requirement, decision,
+    or incident.
+  - Keep personal preferences in personal memory rather than project memory.
+  allowed_memory_types:
+  - requirement
+  - directive
+  - state
+  - decision
+  - incident
+  - rollup
+  protected_memory_types:
+  - requirement
+  - decision
+  - incident
+  min_salience: 0.0
+  max_memories_per_candidate: 12
+  dedup_threshold: 0.87
+  min_endorsements: 1

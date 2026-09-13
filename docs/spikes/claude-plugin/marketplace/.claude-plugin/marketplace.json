@@ -1,0 +1,14 @@
+{
+  "name": "memotron-spike-marketplace",
+  "description": "Local test marketplace for the Memotron Claude Code plugin spike.",
+  "owner": {
+    "name": "JEDAI Memotron"
+  },
+  "plugins": [
+    {
+      "name": "memotron-memory",
+      "source": "./memotron-memory",
+      "description": "Typed, governed agent memory (Memotron) as a Claude Code plugin: bundled MCP connector, session/compaction hooks that drive the Dream Engine, and memory inspection skills."
+    }
+  ]
+}

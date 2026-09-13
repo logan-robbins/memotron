@@ -1,0 +1,89 @@
+{
+  "hooks": {
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "args": [
+              "hook",
+              "post-compact",
+              "--project-root",
+              "${CLAUDE_PROJECT_DIR}"
+            ],
+            "command": "memotron",
+            "statusMessage": "Syncing Memotron memory",
+            "timeout": 60,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "args": [
+              "hook",
+              "pre-compact",
+              "--project-root",
+              "${CLAUDE_PROJECT_DIR}"
+            ],
+            "command": "memotron",
+            "statusMessage": "Syncing Memotron memory",
+            "timeout": 60,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "args": [
+              "hook",
+              "session-end",
+              "--project-root",
+              "${CLAUDE_PROJECT_DIR}"
+            ],
+            "command": "memotron",
+            "statusMessage": "Syncing Memotron memory",
+            "timeout": 60,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "args": [
+              "hook",
+              "session-start",
+              "--project-root",
+              "${CLAUDE_PROJECT_DIR}"
+            ],
+            "command": "memotron",
+            "statusMessage": "Syncing Memotron memory",
+            "timeout": 30,
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/scripts/hooks/session-brief.sh"
+            ],
+            "command": "bash",
+            "statusMessage": "Loading takeover handoff",
+            "timeout": 10,
+            "type": "command"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,1933 @@
+{
+  "bands": {
+    "cross_page_join": {
+      "mean_score": 1.0,
+      "scenario_count": 8
+    },
+    "single_fact_lookup": {
+      "mean_score": 1.0,
+      "scenario_count": 8
+    },
+    "temporal_supersession": {
+      "mean_score": 1.0,
+      "scenario_count": 8
+    }
+  },
+  "report": {
+    "answer_runtime_identifier": "profile-top-evidence@v1",
+    "failures": [],
+    "judge_identifier": "locomo-official-f1@3eb6f2c",
+    "lifecycle_invariants_passed": true,
+    "mean_score": 1.0,
+    "motive_name": "kb-recall",
+    "options": {
+      "minimum_stability_score": 1.0,
+      "model_identifier": "rule-based@v1",
+      "repetitions": 2,
+      "require_material_policy_delta": false,
+      "temperature": 0.0
+    },
+    "passed": true,
+    "samples": [
+      {
+        "mean_score": 1.0,
+        "repetition": 0,
+        "scores": [
+          {
+            "category": "4",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "8717e5c5-2cba-407a-b207-eb4b7ea1ce70",
+              "d198321a-6ebb-40f7-a3cb-b6b7fbf78cf7",
+              "e819e068-a0e2-415e-a1e5-f52dd130fab0"
+            ],
+            "question_id": "single-01",
+            "response_digest": "72b6aa285884d3d32f5b3375b85bd8a055730680d6904ff55e928ee7cd3d1e45",
+            "scenario_id": "single-01",
+            "score": 1.0
+          },
+          {
+            "category": "4",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "9f99f364-b42b-46b9-939d-9bb7131b95b9",
+              "a98bbf88-df0f-4266-883d-e36b98ca9eed",
+              "ff8c694b-6f6d-4ce3-a7dd-119600ea7668"
+            ],
+            "question_id": "single-02",
+            "response_digest": "c9efdaf3f2c716965a71c8f31e1621334103eb4c4639de912f72d63533107960",
+            "scenario_id": "single-02",
+            "score": 1.0
+          },
+          {
+            "category": "4",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "2ba7c8df-88bb-4308-9571-c5f3a77e9958",
+              "341108b3-7f6a-43b0-b46c-2be61642ce7a",
+              "ab64bcee-744c-4388-b0d6-f47754654677"
+            ],
+            "question_id": "single-03",
+            "response_digest": "91dcd9c6506dbb0d9c0d185064ce17264d2152452ab4f7d41df701e7ff6f045f",
+            "scenario_id": "single-03",
+            "score": 1.0
+          },
+          {
+            "category": "4",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "2ab28279-cb8d-42e1-98e1-e910d9c06e68",
+              "6c0344da-1174-4f8f-ab18-308f74308870",
+              "c81a260a-a80c-4dcb-bd6d-7ae21dfdc055"
+            ],
+            "question_id": "single-04",
+            "response_digest": "064afd65574e1304e172b908780270ad0819897ba802dafa613f3ed6d4d0f3bf",
+            "scenario_id": "single-04",
+            "score": 1.0
+          },
+          {
+            "category": "4",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "06697bdf-9c34-4ccd-935f-a25d2b40e11e",
+              "18166ade-aebd-44b1-9694-afbd0994b835",
+              "615f75c5-8c57-4979-ab75-f1b4ea604cba"
+            ],
+            "question_id": "single-05",
+            "response_digest": "0b126db96578ff9358d963b114fce0703b54aaa93108c09b9365eee75ca40639",
+            "scenario_id": "single-05",
+            "score": 1.0
+          },
+          {
+            "category": "4",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "352d23dd-eebb-432c-8a9d-57266677149d",
+              "6769c3d7-666c-4abc-948f-a5f15f7bb1fe",
+              "9a0b52a0-1ac1-458c-a9af-024e076b9bdd"
+            ],
+            "question_id": "single-06",
+            "response_digest": "942b5ef1539eddb8dd600fc71bff36c1dfbc403b8168c02fcf32d654d13bf439",
+            "scenario_id": "single-06",
+            "score": 1.0
+          },
+          {
+            "category": "4",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "00dbd853-fc32-4839-9c49-f97072ab64bd",
+              "d0d50650-2fb9-4587-b181-3e69e9dcaa67",
+              "dffaa9d2-a282-4b6b-82cd-3a582dcaa138"
+            ],
+            "question_id": "single-07",
+            "response_digest": "8a34d467851e214150fa188f446e11484435b52410397f899fd45f6bdf828faa",
+            "scenario_id": "single-07",
+            "score": 1.0
+          },
+          {
+            "category": "4",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "084f975f-5146-4e22-be4b-4a4e7b294ab4",
+              "63520f10-ee30-459e-bd16-418df1b5f678",
+              "75738139-8b53-40c0-924c-58096bd4e6ae"
+            ],
+            "question_id": "single-08",
+            "response_digest": "03a620ad4ff62a9b7ed3799f0054853a6d46c7f6e6bbe126dc0127c89f3613dd",
+            "scenario_id": "single-08",
+            "score": 1.0
+          },
+          {
+            "category": "1",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "49bad447-f479-44c1-bcac-e0a7547b08f9",
+              "8935ea7c-3a4b-4805-b6b9-fa6efae4ebc1",
+              "f9cd1e21-bbeb-489c-b853-97d63ba189f3"
+            ],
+            "question_id": "join-01",
+            "response_digest": "365776c7b407f9a8344c35f76d789e5a4e11f9513e7a3483b4562354d9613ba4",
+            "scenario_id": "join-01",
+            "score": 1.0
+          },
+          {
+            "category": "1",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "11e626d7-5ef8-4f70-99aa-3185c1807cba",
+              "8279f908-df56-41c6-8ae4-1a7e746fd58b",
+              "c6ab543a-4caa-45fd-ba1c-9b8a946b3036"
+            ],
+            "question_id": "join-02",
+            "response_digest": "2899982ab9385662f68f784878af55dad7046e64646c6b13e26dbdd0ce8a6a45",
+            "scenario_id": "join-02",
+            "score": 1.0
+          },
+          {
+            "category": "1",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "9a7e9fc2-a03b-4f3f-b86e-725e5c03a586",
+              "d0232507-9479-4e30-8c43-ac576ed79239",
+              "f950eab4-8173-48e8-9e78-b47d13053c6b"
+            ],
+            "question_id": "join-03",
+            "response_digest": "1a4ef647b669370d059799e2977324d2d7fc6a7d597ae6f96bcf3f22fc3037a1",
+            "scenario_id": "join-03",
+            "score": 1.0
+          },
+          {
+            "category": "1",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "62e10c72-b931-4964-b16e-36f02800a8b8",
+              "bcca3eae-84bc-4516-8a01-5cb34baa2b2d",
+              "faab8a3e-2839-4ea3-8355-a890f969ef3f"
+            ],
+            "question_id": "join-04",
+            "response_digest": "bf0d26aaed0de871d71f0252b882a9d453ee4586be7ad885904276b9bc933df6",
+            "scenario_id": "join-04",
+            "score": 1.0
+          },
+          {
+            "category": "1",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "325f75f0-f235-4f51-97e6-58375296399a",
+              "b51ea846-9f9b-4e7b-8000-b027c5175d9c",
+              "f9c295f1-6c82-40b9-8d53-2c8b5aa1a1c0"
+            ],
+            "question_id": "join-05",
+            "response_digest": "aba96d48d09e93fdd7e9e89fa06e47ea4e17cb24cf28a970b94c6680be4f745f",
+            "scenario_id": "join-05",
+            "score": 1.0
+          },
+          {
+            "category": "1",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "2250b266-80df-44bc-b4e9-c3947566e194",
+              "4348bb60-173e-45f4-a36f-34deda45e9fd",
+              "e3cd6155-097c-4e71-bd99-fed5c7633f37"
+            ],
+            "question_id": "join-06",
+            "response_digest": "1252b889db8efb7876ecc2539b988983d1071d7077fc7ce65358c420f9ead5ab",
+            "scenario_id": "join-06",
+            "score": 1.0
+          },
+          {
+            "category": "1",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "9fadcbd8-8f98-403e-a553-e1f0276ab012",
+              "b5b3723d-edfd-437c-be13-b598320403e9",
+              "ce9b15bc-07da-43a7-92ae-ddd15fd9a657"
+            ],
+            "question_id": "join-07",
+            "response_digest": "ad519a72339ff8350f1137de29b0d4b412900712c21ac1aa505de603a9666150",
+            "scenario_id": "join-07",
+            "score": 1.0
+          },
+          {
+            "category": "1",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "3a4f4429-a8ea-48b3-8ba8-e9e4cb998c53",
+              "4d5f5b41-0588-413d-974f-4e001ae08a6a",
+              "edcd3ca6-6196-4294-89b0-17e0f4084b13"
+            ],
+            "question_id": "join-08",
+            "response_digest": "42406682a954c987ce7641a82805266ea87a878397096d97cc67fab2c252300a",
+            "scenario_id": "join-08",
+            "score": 1.0
+          },
+          {
+            "category": "2",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "5dfed493-66b3-4c1a-b06f-519868095131",
+              "c9a7c52f-efd9-47c4-b55a-512b72511890",
+              "e512b6d5-020a-4a6f-a240-0148169072fd"
+            ],
+            "question_id": "temporal-current-01",
+            "response_digest": "101e3bd71ee16f08da8d4b7eaf8df9bd476500f430e5198fc3795e454607a1e9",
+            "scenario_id": "temporal-current-01",
+            "score": 1.0
+          },
+          {
+            "category": "2",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "76cb2970-253b-40e9-86e1-42bca9f5bc27",
+              "86d930a5-0df7-493c-a290-65c903eccef3",
+              "dddad5d7-dd6e-4582-a302-e211c179aab0"
+            ],
+            "question_id": "temporal-historical-01",
+            "response_digest": "ca1d1dc844ea7520f6f4b192dfc113dc049103a6d9948b5bd6a91cf59cf52e4d",
+            "scenario_id": "temporal-historical-01",
+            "score": 1.0
+          },
+          {
+            "category": "2",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "2106a882-7e3f-49f0-8527-e95f303b8644",
+              "34f9beb4-fcad-453a-b617-c9cec3cda6d9",
+              "da96cd2c-badd-4613-a62a-43e5040e5e15"
+            ],
+            "question_id": "temporal-current-02",
+            "response_digest": "45e826ec64566a6aa014f593c30a6c7cbe43c51f2e79cd9f2694a7a5cd8a4562",
+            "scenario_id": "temporal-current-02",
+            "score": 1.0
+          },
+          {
+            "category": "2",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "58e61f62-0ffc-48e2-8b63-ebdb26528637",
+              "70fcbe45-e99a-433f-9fdc-d0a5588e61e4",
+              "f9bb7cd6-dcd4-4e79-8783-19a2fe0f5690"
+            ],
+            "question_id": "temporal-historical-02",
+            "response_digest": "2441c6befa1afa61e63f397037256d63eb48ed46d24da73a89c03fa06a30b67e",
+            "scenario_id": "temporal-historical-02",
+            "score": 1.0
+          },
+          {
+            "category": "2",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "4545cc56-68b0-497f-a7cc-8dad31afbc72",
+              "e6b6d716-dcb1-4267-8151-0c981ccd7eef",
+              "f28fb29e-a40c-48a4-a949-48183f49f370"
+            ],
+            "question_id": "temporal-current-03",
+            "response_digest": "d3f863b1aa838185f8aa91a9dc28220c26580f2a967be7f3756103685983bf13",
+            "scenario_id": "temporal-current-03",
+            "score": 1.0
+          },
+          {
+            "category": "2",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "3955bc39-75c8-48c4-ad4a-ec076139fab7",
+              "6bf1faf9-e2ae-4522-9e43-3f23c3efd370",
+              "82cf41ba-5331-4605-8bd4-416d06c1ac4a"
+            ],
+            "question_id": "temporal-historical-03",
+            "response_digest": "50cecd795ec8145bee6777df3119f5f6e072bcf66f74a10a4cbd6020af697265",
+            "scenario_id": "temporal-historical-03",
+            "score": 1.0
+          },
+          {
+            "category": "2",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "0375a15f-e341-4cb2-895d-9748bf518748",
+              "46a1d18b-6c8e-4766-ae82-9a103f5f85dd",
+              "d7582b5b-bad9-4903-8bc4-bbcfb1dcca6c"
+            ],
+            "question_id": "temporal-current-04",
+            "response_digest": "7ab70dcef0fc47242b577daa6aa5209f55665992c137f240b49f61f213d132d7",
+            "scenario_id": "temporal-current-04",
+            "score": 1.0
+          },
+          {
+            "category": "2",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "622bb143-8c04-4701-8c4f-bfb968ae75e8",
+              "c3ab148e-1278-4475-86c3-22194afac5fa",
+              "de1d543d-ab2e-4a86-ac57-5d74b6c86688"
+            ],
+            "question_id": "temporal-historical-04",
+            "response_digest": "9298574630e3e110034a3620f11b6f7b6fd727d4cc5b51f18db124c17caa7a82",
+            "scenario_id": "temporal-historical-04",
+            "score": 1.0
+          }
+        ]
+      },
+      {
+        "mean_score": 1.0,
+        "repetition": 1,
+        "scores": [
+          {
+            "category": "4",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "3e2a4f3b-dfd1-4dd8-9ecc-fdbd01a77fe1",
+              "5105aaa3-4201-497e-a789-c417b15b69ac",
+              "ffad0d19-91a1-4175-80be-63e1e80858f1"
+            ],
+            "question_id": "single-01",
+            "response_digest": "72b6aa285884d3d32f5b3375b85bd8a055730680d6904ff55e928ee7cd3d1e45",
+            "scenario_id": "single-01",
+            "score": 1.0
+          },
+          {
+            "category": "4",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "31fae2f7-546b-4c90-a17a-0796d32f5e07",
+              "3eb12da9-15e5-460c-845c-a9426e1e5c31",
+              "c7fc6214-e1b5-4618-9ce4-18d5e869b593"
+            ],
+            "question_id": "single-02",
+            "response_digest": "c9efdaf3f2c716965a71c8f31e1621334103eb4c4639de912f72d63533107960",
+            "scenario_id": "single-02",
+            "score": 1.0
+          },
+          {
+            "category": "4",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "5441a1e2-ece1-46a5-b0d0-b2249a4802ef",
+              "7d1bdda0-3d17-45c1-8a32-9c3aa051b769",
+              "c96f0092-68e3-48ac-804c-8d1072296181"
+            ],
+            "question_id": "single-03",
+            "response_digest": "91dcd9c6506dbb0d9c0d185064ce17264d2152452ab4f7d41df701e7ff6f045f",
+            "scenario_id": "single-03",
+            "score": 1.0
+          },
+          {
+            "category": "4",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "3955e51b-1f3f-4905-9ca6-c6e9a4b26b3a",
+              "74933ec3-6acb-4e02-b851-93e60722efab",
+              "f16140e5-cab1-4b75-8f9f-97a55665f118"
+            ],
+            "question_id": "single-04",
+            "response_digest": "064afd65574e1304e172b908780270ad0819897ba802dafa613f3ed6d4d0f3bf",
+            "scenario_id": "single-04",
+            "score": 1.0
+          },
+          {
+            "category": "4",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "0155fb32-5856-474e-b928-065f94604a0d",
+              "af4a55d6-f265-4f23-a702-25499c1ee3ef",
+              "e02fe4ac-5661-4a18-a14d-61f2642a752f"
+            ],
+            "question_id": "single-05",
+            "response_digest": "0b126db96578ff9358d963b114fce0703b54aaa93108c09b9365eee75ca40639",
+            "scenario_id": "single-05",
+            "score": 1.0
+          },
+          {
+            "category": "4",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "2f5772fb-bc71-4d04-99d4-17850fce61d7",
+              "3d9072e8-8e1e-4072-ab16-ada51c2d1d32",
+              "c4128abd-590d-4f03-b17f-e2fd50ae3ba0"
+            ],
+            "question_id": "single-06",
+            "response_digest": "942b5ef1539eddb8dd600fc71bff36c1dfbc403b8168c02fcf32d654d13bf439",
+            "scenario_id": "single-06",
+            "score": 1.0
+          },
+          {
+            "category": "4",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "45292442-4712-4b4b-a731-9ac971af6ad1",
+              "5e912e0f-cf2d-4eef-89cb-bad8c02bce88",
+              "7ff8e775-b28e-496d-8d36-ac9c595b5a85"
+            ],
+            "question_id": "single-07",
+            "response_digest": "8a34d467851e214150fa188f446e11484435b52410397f899fd45f6bdf828faa",
+            "scenario_id": "single-07",
+            "score": 1.0
+          },
+          {
+            "category": "4",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "01570453-d8ed-4a6b-8437-43d7041b0947",
+              "8000f9e5-9a83-4fcc-9c93-8058b248637c",
+              "83713633-c6db-4ab1-a033-69376cf1120d"
+            ],
+            "question_id": "single-08",
+            "response_digest": "03a620ad4ff62a9b7ed3799f0054853a6d46c7f6e6bbe126dc0127c89f3613dd",
+            "scenario_id": "single-08",
+            "score": 1.0
+          },
+          {
+            "category": "1",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "6c1dd4f1-e6a5-424c-b39b-8ed051d9a11f",
+              "91ca5d92-1af0-474a-a0fe-5ea8ac595c6d",
+              "ea975e01-5851-49d4-8788-9f7e90071ca7"
+            ],
+            "question_id": "join-01",
+            "response_digest": "365776c7b407f9a8344c35f76d789e5a4e11f9513e7a3483b4562354d9613ba4",
+            "scenario_id": "join-01",
+            "score": 1.0
+          },
+          {
+            "category": "1",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "1d726e61-9b27-4051-9abe-383819056fef",
+              "4260ce70-bcb1-45af-9f58-c99600e05e01",
+              "9ef9d2c4-cf6d-4685-b88c-2fefb11f8c64"
+            ],
+            "question_id": "join-02",
+            "response_digest": "2899982ab9385662f68f784878af55dad7046e64646c6b13e26dbdd0ce8a6a45",
+            "scenario_id": "join-02",
+            "score": 1.0
+          },
+          {
+            "category": "1",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "0cf61f28-14e9-408b-8f28-ff228899a329",
+              "40e6260e-146e-4ada-879f-321e0495805f",
+              "92e7944e-9314-426f-973d-9c1bd8e0c91a"
+            ],
+            "question_id": "join-03",
+            "response_digest": "1a4ef647b669370d059799e2977324d2d7fc6a7d597ae6f96bcf3f22fc3037a1",
+            "scenario_id": "join-03",
+            "score": 1.0
+          },
+          {
+            "category": "1",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "05dfcd18-8ea0-4c79-994f-1e844df9126a",
+              "53344691-b7c7-47cb-a4d4-6fd8b50a4565",
+              "e8a0196e-0590-4a70-b6a1-ad3d9c94e26c"
+            ],
+            "question_id": "join-04",
+            "response_digest": "bf0d26aaed0de871d71f0252b882a9d453ee4586be7ad885904276b9bc933df6",
+            "scenario_id": "join-04",
+            "score": 1.0
+          },
+          {
+            "category": "1",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "070a9c89-89fe-49b3-8ca2-b38f8457a3de",
+              "17c9f9fb-f2f8-49f5-96ff-24eadc6414b2",
+              "50608b9f-b989-457b-8460-3bf59552f269"
+            ],
+            "question_id": "join-05",
+            "response_digest": "aba96d48d09e93fdd7e9e89fa06e47ea4e17cb24cf28a970b94c6680be4f745f",
+            "scenario_id": "join-05",
+            "score": 1.0
+          },
+          {
+            "category": "1",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "83d32211-add8-4836-895d-a66e4e940de7",
+              "e1ce3ae3-3f2c-4679-b343-3094d4b38140",
+              "f8da1cb2-f402-4216-9d45-96d1ac5a3208"
+            ],
+            "question_id": "join-06",
+            "response_digest": "1252b889db8efb7876ecc2539b988983d1071d7077fc7ce65358c420f9ead5ab",
+            "scenario_id": "join-06",
+            "score": 1.0
+          },
+          {
+            "category": "1",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "2c8fa677-6353-4190-8809-37fd8393278a",
+              "437a3fd4-c14c-4c12-9acf-2af59fa22617",
+              "52331601-fe62-4e1f-97e5-e842a51fccc8"
+            ],
+            "question_id": "join-07",
+            "response_digest": "ad519a72339ff8350f1137de29b0d4b412900712c21ac1aa505de603a9666150",
+            "scenario_id": "join-07",
+            "score": 1.0
+          },
+          {
+            "category": "1",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "2f7e8706-8362-4496-899d-63046218e54a",
+              "504b098f-68d3-4287-9518-367cd7e724d0",
+              "fd26df1d-1a53-47ab-b8e3-2f51b6abdb0e"
+            ],
+            "question_id": "join-08",
+            "response_digest": "42406682a954c987ce7641a82805266ea87a878397096d97cc67fab2c252300a",
+            "scenario_id": "join-08",
+            "score": 1.0
+          },
+          {
+            "category": "2",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "6eb7d311-eaf5-4d53-ae85-55b040a97334",
+              "7d914304-ca5b-47e1-b53a-d94e6550d3a3",
+              "9ab7e052-1156-40db-ac55-36b892881d33"
+            ],
+            "question_id": "temporal-current-01",
+            "response_digest": "101e3bd71ee16f08da8d4b7eaf8df9bd476500f430e5198fc3795e454607a1e9",
+            "scenario_id": "temporal-current-01",
+            "score": 1.0
+          },
+          {
+            "category": "2",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "55e62969-71f8-419c-ac34-a7ed598d5c32",
+              "7d8d75f6-754c-40d6-996d-0491d9bc11a3",
+              "9ad3b04f-521d-4a0f-b782-53dac850771e"
+            ],
+            "question_id": "temporal-historical-01",
+            "response_digest": "ca1d1dc844ea7520f6f4b192dfc113dc049103a6d9948b5bd6a91cf59cf52e4d",
+            "scenario_id": "temporal-historical-01",
+            "score": 1.0
+          },
+          {
+            "category": "2",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "a8887607-32c8-46e0-bc07-fd2a6eb12375",
+              "c0c19920-6ee3-4b6d-8150-d0075a22ad1a",
+              "db43be5a-0593-43b2-8247-14582d9c8b93"
+            ],
+            "question_id": "temporal-current-02",
+            "response_digest": "45e826ec64566a6aa014f593c30a6c7cbe43c51f2e79cd9f2694a7a5cd8a4562",
+            "scenario_id": "temporal-current-02",
+            "score": 1.0
+          },
+          {
+            "category": "2",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "70c2fd6b-3852-469b-96f3-cd61d43d7346",
+              "9a816f67-ee0b-429f-817a-61f16706b78d",
+              "d58120c1-e856-40a5-bceb-2be8879e1f24"
+            ],
+            "question_id": "temporal-historical-02",
+            "response_digest": "2441c6befa1afa61e63f397037256d63eb48ed46d24da73a89c03fa06a30b67e",
+            "scenario_id": "temporal-historical-02",
+            "score": 1.0
+          },
+          {
+            "category": "2",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "12774930-489e-4db3-83e1-772ba951c881",
+              "17685ab0-d3a6-41af-b9b9-0552e15f2a33",
+              "e88c7bf9-b934-453f-8d12-806fd419113b"
+            ],
+            "question_id": "temporal-current-03",
+            "response_digest": "d3f863b1aa838185f8aa91a9dc28220c26580f2a967be7f3756103685983bf13",
+            "scenario_id": "temporal-current-03",
+            "score": 1.0
+          },
+          {
+            "category": "2",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "2380b8b6-e206-423e-b1eb-e1755ce4932f",
+              "90ede0cc-0402-465d-9a8d-e8664c6878bb",
+              "c00f00c9-6dad-43f3-9802-9ae2313df171"
+            ],
+            "question_id": "temporal-historical-03",
+            "response_digest": "50cecd795ec8145bee6777df3119f5f6e072bcf66f74a10a4cbd6020af697265",
+            "scenario_id": "temporal-historical-03",
+            "score": 1.0
+          },
+          {
+            "category": "2",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "1c91b209-0f3d-4fa7-9270-2c249cb8a8b9",
+              "1e0f3c22-72b5-4371-b53a-96bd9b9f51ca",
+              "ef69b944-162d-4ed6-aed1-e7ea15e4aa07"
+            ],
+            "question_id": "temporal-current-04",
+            "response_digest": "7ab70dcef0fc47242b577daa6aa5209f55665992c137f240b49f61f213d132d7",
+            "scenario_id": "temporal-current-04",
+            "score": 1.0
+          },
+          {
+            "category": "2",
+            "lifecycle_invariants": [
+              {
+                "detail": "all sequential replay receipt chains verify",
+                "name": "receipt_chain",
+                "passed": true
+              },
+              {
+                "detail": "active retrieval candidates obey the Motive type allocation",
+                "name": "retrieval_allocation",
+                "passed": true
+              },
+              {
+                "detail": "no protected row was pruned during replay",
+                "name": "protected_retention",
+                "passed": true
+              },
+              {
+                "detail": "no stale derived theme remains context-visible",
+                "name": "theme_invalidation",
+                "passed": true
+              },
+              {
+                "detail": "every anti-windup hold has an attributed incident",
+                "name": "coherence_attribution",
+                "passed": true
+              }
+            ],
+            "profile_relationship_uuids": [
+              "2c140922-98c0-4e4c-a7ff-b60f96514c54",
+              "abdab41d-4b7b-4317-bfae-7da2f976cc46",
+              "e1c06add-0417-4c33-8631-039c9922cb3d"
+            ],
+            "question_id": "temporal-historical-04",
+            "response_digest": "9298574630e3e110034a3620f11b6f7b6fd727d4cc5b51f18db124c17caa7a82",
+            "scenario_id": "temporal-historical-04",
+            "score": 1.0
+          }
+        ]
+      }
+    ],
+    "score_standard_deviation": 0.0,
+    "stability_score": 1.0,
+    "suite_digest": "4f88b4e1f35becdcc8eef3026ca4fdf9467503d7a38200404de3005d36310beb",
+    "suite_name": "memotron-kb-v1",
+    "suite_source": "memotron-kb-v1"
+  },
+  "run": {
+    "adapter": "LongMemEvalCorpusAdapter",
+    "answer_runtime_identifier": "profile-top-evidence@v1",
+    "command": "uv run examples/benchmark_report.py",
+    "corpus": "synthetic (fictional Northport Systems domain); see corpus.json _meta",
+    "corpus_path": "benchmarks/memotron_kb_v1/corpus.json",
+    "generated_at": "2026-08-06T15:46:45.149498+00:00",
+    "git_describe": "5e1de70-dirty",
+    "judge_identifier": "locomo-official-f1@3eb6f2c"
+  }
+}

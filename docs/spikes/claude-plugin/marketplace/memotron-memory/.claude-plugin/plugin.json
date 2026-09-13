@@ -1,0 +1,16 @@
+{
+  "name": "memotron-memory",
+  "displayName": "Memotron Memory",
+  "version": "0.1.0-spike",
+  "description": "Typed, governed agent memory backed by Memotron's temporal property graph and Dream Engine (Formation / Consolidation / Pruning / Coherence).",
+  "author": {
+    "name": "JEDAI Memotron"
+  },
+  "homepage": "https://github.disney.com/jedai/memotron",
+  "keywords": [
+    "memory",
+    "mcp",
+    "agent-memory",
+    "memotron"
+  ]
+}

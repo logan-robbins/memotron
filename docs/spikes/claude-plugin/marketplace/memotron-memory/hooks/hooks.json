@@ -1,0 +1,56 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/bin/memotron-run",
+            "args": ["hook", "session-start", "--project-root", "${CLAUDE_PROJECT_DIR}"],
+            "timeout": 30,
+            "statusMessage": "Syncing Memotron memory"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/bin/memotron-run",
+            "args": ["hook", "pre-compact", "--project-root", "${CLAUDE_PROJECT_DIR}"],
+            "timeout": 60,
+            "statusMessage": "Syncing Memotron memory"
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/bin/memotron-run",
+            "args": ["hook", "post-compact", "--project-root", "${CLAUDE_PROJECT_DIR}"],
+            "timeout": 60,
+            "statusMessage": "Syncing Memotron memory"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/bin/memotron-run",
+            "args": ["hook", "session-end", "--project-root", "${CLAUDE_PROJECT_DIR}"],
+            "timeout": 60,
+            "statusMessage": "Syncing Memotron memory"
+          }
+        ]
+      }
+    ]
+  }
+}

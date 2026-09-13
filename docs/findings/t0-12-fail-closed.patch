@@ -1,0 +1,29 @@
+diff --git a/src/memotron/replay.py b/src/memotron/replay.py
+index c778297..abb7648 100644
+--- a/src/memotron/replay.py
++++ b/src/memotron/replay.py
+@@ -1070,7 +1070,23 @@ async def verify_no_silent_mutation(ledger: Any, graph: Any, *, scope_key: str)
+             replayed_runs.add(receipt.run_uuid)
+ 
+     live_hash = graph.graph_state_hash(scope_key)
+-    if latest_hash is not None and live_hash != latest_hash:
++    if latest_hash is None:
++        # T0-12: no mutating receipt explains this scope's state at all. Guarding the
++        # comparison on `latest_hash is not None` (as this did) meant zero receipts skipped
++        # the check entirely and the verdict came back passed=True -- the exact case this
++        # function exists to detect, and the value certification_bundle exports.
++        #
++        # Zero receipts is only consistent with an EMPTY scope. graph_state_hash is a
++        # deterministic digest over the scope's tuple set, so every empty scope yields the
++        # same constant; asking for an unused key is the cheapest way to obtain it without
++        # a new storage method.
++        empty_hash = graph.graph_state_hash("\x00memotron:empty-scope-probe")
++        if live_hash != empty_hash:
++            errors.append(
++                f"scope holds live state ({live_hash}) but no mutating receipt explains it: "
++                "every live row must be bracketed by a receipt"
++            )
++    elif live_hash != latest_hash:
+         errors.append(
+             f"live graph state hash {live_hash} does not match latest receipted state hash {latest_hash}"
+         )

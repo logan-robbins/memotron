@@ -1,0 +1,1534 @@
+:root {
+  color-scheme: light;
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --surface-alt: #f9fbfb;
+  --line: #dbe1e6;
+  --line-strong: #c5cdd6;
+  --ink: #1f2a32;
+  --muted: #697783;
+  --blue: #295e9f;
+  --green: #19735b;
+  --red: #b23b4a;
+  --amber: #9d6814;
+  --violet: #7656b7;
+  --shadow: 0 1px 2px rgb(31 42 50 / 8%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 14px/1.4 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+}
+
+.sidebar {
+  background: #26343d;
+  color: #f5f8fb;
+  padding: 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px 12px;
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+}
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #edf5f5;
+  color: #26343d;
+  font-weight: 800;
+}
+
+.brand strong,
+.brand span {
+  display: block;
+}
+
+.brand span {
+  color: #b8c5ce;
+  font-size: 12px;
+}
+
+.nav-list {
+  display: grid;
+  gap: 4px;
+}
+
+.nav-item {
+  min-height: 38px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #d7e1e8;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 10px;
+  text-align: left;
+}
+
+.nav-item.active,
+.nav-item:hover {
+  background: #edf5f5;
+  color: #1f2a32;
+}
+
+.workspace {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  min-height: 78px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 22px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.eyebrow {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 760;
+}
+
+h2 {
+  font-size: 15px;
+  font-weight: 760;
+}
+
+h3 {
+  font-size: 13px;
+  font-weight: 730;
+}
+
+.status-strip {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+}
+
+.status {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 7px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  background: var(--surface-alt);
+}
+
+.status.good {
+  color: var(--green);
+}
+
+.status.warn {
+  color: var(--amber);
+}
+
+.scope-picker span,
+label span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  padding: 0 9px;
+}
+
+input,
+select {
+  height: 34px;
+}
+
+textarea {
+  min-height: 96px;
+  padding: 8px 9px;
+  resize: vertical;
+}
+
+.scope-picker select {
+  width: 260px;
+}
+
+.screen {
+  padding: 18px 22px 42px;
+}
+
+.stack {
+  display: grid;
+  gap: 14px;
+}
+
+.panel,
+.metric {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.panel {
+  padding: 15px;
+  min-width: 0;
+}
+
+.panel-head,
+.snippet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  min-height: 82px;
+  padding: 14px;
+  display: grid;
+  align-content: space-between;
+  gap: 6px;
+}
+
+.metric span {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.metric strong {
+  font: 760 26px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.metric strong.wide {
+  font-size: 20px;
+}
+
+/* An honestly-unmeasured value is not a number, so it must not look like one. */
+.metric strong.unmeasured {
+  color: var(--muted);
+  font: 600 13px/1.3 Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.metric-hint {
+  color: var(--muted);
+  font-size: 11px;
+  font-style: normal;
+  line-height: 1.3;
+}
+
+.metric-caption {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 2px 0 -4px;
+}
+
+/* Diagnostics row: same cards, quieter, so the token economics stay the headline. */
+.metric-grid.quiet .metric {
+  background: var(--surface-alt);
+  min-height: 68px;
+  padding: 12px;
+}
+
+.metric-grid.quiet .metric strong {
+  font-size: 18px;
+}
+
+.metric-grid.quiet .metric strong.unmeasured {
+  font-size: 12px;
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.panel-grid.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: 118px minmax(0, 1fr);
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.kv span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.kv strong {
+  font-weight: 620;
+  overflow-wrap: anywhere;
+}
+
+.mono,
+pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.readiness-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.readiness-row {
+  min-height: 34px;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+}
+
+.readiness-row svg {
+  color: var(--green);
+}
+
+.toolbar {
+  display: grid;
+  /* Column 5 holds the "Show demoted" toggle; its label must not wrap.  The
+     width it gained came out of the search column's minimum, so the toolbar's
+     total minimum width is unchanged. */
+  grid-template-columns: minmax(226px, 1fr) minmax(150px, 170px) minmax(150px, 170px) 150px 122px 104px 172px;
+  gap: 10px;
+  align-items: end;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.smart-search {
+  position: relative;
+}
+
+.suggestions {
+  position: absolute;
+  z-index: 10;
+  top: 38px;
+  left: 0;
+  right: 0;
+  display: grid;
+  max-height: 260px;
+  overflow: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 10px 22px rgb(31 42 50 / 12%);
+}
+
+.suggestions button {
+  min-height: 34px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  background: #fff;
+  color: var(--ink);
+  padding: 6px 9px;
+  text-align: left;
+}
+
+.suggestions button:hover {
+  background: #eef5fb;
+}
+
+.suggestions span {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.suggestions strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.multi-select {
+  position: relative;
+}
+
+.multi-select summary {
+  height: 34px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 9px;
+  cursor: pointer;
+}
+
+.multi-select summary span {
+  color: var(--ink);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.multi-menu {
+  position: absolute;
+  z-index: 12;
+  top: 38px;
+  left: 0;
+  min-width: 220px;
+  display: grid;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 10px 22px rgb(31 42 50 / 12%);
+}
+
+.menu-check {
+  height: 30px;
+}
+
+.empty-state.compact {
+  padding: 8px;
+}
+
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon svg {
+  position: absolute;
+  left: 9px;
+  top: 10px;
+  color: var(--muted);
+}
+
+.input-with-icon input {
+  padding-left: 30px;
+}
+
+.input-with-icon.has-close input {
+  padding-right: 34px;
+}
+
+.smart-search-close {
+  position: absolute;
+  right: 6px;
+  top: 5px;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--muted);
+  padding: 0;
+}
+
+.input-with-icon .smart-search-close svg {
+  position: static;
+}
+
+.smart-search-close:hover {
+  background: #eef5fb;
+  color: var(--ink);
+}
+
+.check {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.check span {
+  white-space: nowrap;
+}
+
+.check input {
+  width: 16px;
+  height: 16px;
+}
+
+.primary-button,
+.secondary-button,
+.danger-button,
+.icon-button,
+.segmented button {
+  height: 34px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid transparent;
+  padding: 0 12px;
+  font-weight: 680;
+}
+
+.primary-button {
+  background: var(--blue);
+  color: white;
+  white-space: nowrap;
+}
+
+.full-width {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.text-button {
+  border: 0;
+  background: transparent;
+  color: var(--blue);
+  padding: 0;
+  font-weight: 700;
+}
+
+.secondary-button {
+  color: var(--blue);
+  background: #eef5fb;
+  border-color: #cfe0ed;
+}
+
+.danger-button {
+  color: var(--red);
+  background: #fff2f4;
+  border-color: #f2c9d0;
+}
+
+.icon-button {
+  width: 34px;
+  padding: 0;
+  color: var(--ink);
+  background: var(--surface-alt);
+  border-color: var(--line-strong);
+}
+
+.segmented {
+  display: inline-flex;
+  position: relative;
+  z-index: 2;
+  width: 172px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 34px;
+}
+
+.segmented button {
+  min-width: 85px;
+  border-radius: 0;
+  border: 0;
+  background: #fff;
+  color: var(--muted);
+}
+
+.segmented button.active {
+  background: #e6f0ee;
+  color: var(--green);
+}
+
+.split-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  gap: 14px;
+  align-items: start;
+}
+
+.graph-panel {
+  min-height: 560px;
+}
+
+.memory-graph-wrap {
+  position: relative;
+}
+
+.memory-graph {
+  width: 100%;
+  /* No aspect-ratio: the viewBox is measured from this element, so any ratio it
+     happens to have is exactly the ratio the graph is laid out for. Fixing both
+     made preserveAspectRatio letterbox the mismatch. */
+  height: 560px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fbfcfc;
+  touch-action: none;
+  cursor: grab;
+}
+
+.memory-graph.panning {
+  cursor: grabbing;
+}
+
+.graph-controls {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.graph-controls button {
+  min-width: 30px;
+  padding: 3px 9px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #293640;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.graph-controls button:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.graph-hint {
+  padding-left: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.graph-focus-chip {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px 5px 12px;
+  font-size: 12px;
+  color: #293640;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgba(15, 30, 40, 0.1);
+}
+
+.graph-focus-chip strong {
+  display: inline-block;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.graph-focus-chip button {
+  padding: 2px 8px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #293640;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.graph-focus-chip button:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.graph-focus-chip .depth-toggle {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.graph-focus-chip .depth-toggle button.active {
+  color: #ffffff;
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+/* svg + information panel side by side; the panel is the legend. */
+.graph-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 194px;
+  gap: 10px;
+  align-items: stretch;
+}
+
+/* The positioning context for the zoom controls, focus chip and node menu, so
+   none of them can drift over the information panel. */
+.graph-canvas-col {
+  position: relative;
+  min-width: 0;
+}
+
+.graph-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  max-height: 560px;
+  padding: 10px 4px 10px 0;
+  font-size: 11.5px;
+}
+
+.graph-info-section h3 {
+  margin: 0 0 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.graph-info-section ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+}
+
+.graph-info-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 3px 6px;
+  font: inherit;
+  color: #293640;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.graph-info-row:hover {
+  background: #eef5fb;
+}
+
+.graph-info-row.active {
+  color: var(--blue);
+  background: #eef5fb;
+  border-color: var(--blue);
+}
+
+.graph-info-swatch {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.graph-info-name {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.graph-info-count {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.graph-info-keys {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.graph-info-keys li {
+  display: flex;
+  gap: 6px;
+  padding: 2px 6px;
+  color: #48555f;
+}
+
+.graph-info-empty {
+  margin: 0;
+  padding: 2px 6px;
+  color: var(--muted);
+}
+
+.graph-empty-note {
+  padding-top: 8px;
+}
+
+.graph-info-clear {
+  padding: 4px 8px;
+  font: inherit;
+  color: #293640;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.graph-info-clear:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+/* Right-click node menu: Neo4j's expand / dismiss / unpin commands. */
+.graph-node-menu {
+  position: absolute;
+  z-index: 4;
+  display: grid;
+  gap: 1px;
+  min-width: 132px;
+  padding: 5px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  box-shadow: 0 3px 12px rgba(15, 30, 40, 0.16);
+}
+
+.graph-node-menu-head {
+  padding: 2px 7px 5px;
+  font-size: 11px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.graph-node-menu button {
+  padding: 5px 7px;
+  font-size: 12px;
+  color: #293640;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.graph-node-menu button:hover:not(:disabled) {
+  background: #eef5fb;
+  color: var(--blue);
+}
+
+.graph-node-menu button:disabled {
+  color: #a8b2ba;
+  cursor: default;
+}
+
+.graph-edge-group {
+  transition: opacity 130ms ease;
+}
+
+.graph-edge-group.dimmed {
+  opacity: 0.08;
+}
+
+.graph-edge {
+  stroke: #b9c3cb;
+  stroke-width: 1.4;
+}
+
+.graph-edge.highlighted {
+  stroke: var(--blue);
+  stroke-width: 2;
+}
+
+.graph-edge.superseded_by {
+  stroke: var(--amber);
+  stroke-dasharray: 5 4;
+}
+
+.graph-edge.derived_from {
+  stroke: var(--violet);
+  stroke-dasharray: 3 4;
+}
+
+.graph-edge.selected {
+  stroke: var(--blue);
+  stroke-width: 2.4;
+}
+
+.graph-edge-hit {
+  cursor: pointer;
+}
+
+.edge-label {
+  fill: var(--muted);
+  font-size: 10px;
+  paint-order: stroke;
+  stroke: #fbfcfc;
+  stroke-width: 4px;
+}
+
+.graph-node {
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  transition: opacity 130ms ease;
+}
+
+.graph-node.dragging {
+  cursor: grabbing;
+}
+
+.graph-node.dimmed {
+  opacity: 0.15;
+}
+
+.graph-node-hit {
+  fill: transparent;
+}
+
+.graph-node circle {
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+
+.graph-node text {
+  fill: #293640;
+  font-size: 11px;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 4px;
+}
+
+.graph-node.selected circle {
+  stroke: var(--blue);
+  stroke-width: 4;
+}
+
+/* A pinned node wears a ring: it is parked, not merely at rest. */
+.graph-node-pin {
+  fill: none;
+  stroke: #293640;
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+
+.inspector-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.label-chip {
+  padding: 2px 8px;
+  font-size: 11px;
+  color: #ffffff;
+  border-radius: 999px;
+  /* A badge wraps as a word, never mid-word -- without this, a narrow table
+     column (`overflow-wrap: anywhere` on `.data-table td`, needed for long
+     entity names) breaks a short label like "Resource" one character per
+     line instead of just wrapping the row around it. */
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.property-table td {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.property-toggle {
+  margin-top: 6px;
+  padding: 4px 8px;
+  font-size: 11.5px;
+  color: #293640;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.property-toggle:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+/*
+ * A relationship rendered as a structured triple, not its `fact` sentence
+ * standing in for a third entity. See `FactTriple` in App.tsx and
+ * `relationshipView.ts`'s `isRedundantFactSentence`.
+ */
+.fact-triple {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.fact-triple-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.fact-endpoint {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.fact-endpoint-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.fact-endpoint-name.empty {
+  color: var(--muted);
+  font-weight: 400;
+  font-style: italic;
+}
+
+.fact-triple-arrow {
+  color: var(--line-strong);
+  font-size: 12px;
+}
+
+.fact-triple-predicate {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+/* The `fact` sentence, demoted: present only when it carries a qualifier the
+ * triple above does not (see `isRedundantFactSentence`) -- a pure
+ * restatement is suppressed rather than printed twice. */
+.fact-sentence {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  table-layout: fixed;
+}
+
+.data-table th,
+.data-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 8px 7px;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.data-table th {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.data-table tr.selected-row td {
+  background: #eef5fb;
+}
+
+.compact-table th {
+  width: 38%;
+}
+
+/*
+ * `table-layout: fixed` divides column width evenly by default, which starves
+ * the one column that actually needs room: a `FactTriple` is two entity chips
+ * plus a predicate, not a single short word like its neighbours (Status,
+ * Confidence, ...). Undersized, its flex row wraps every element onto its own
+ * line and a long entity name breaks mid-word (`overflow-wrap: anywhere` on
+ * `.data-table td`, needed for the occasional very long unbroken token like a
+ * data-store id) even though it would fit on one line with the space its
+ * neighbours don't need.
+ */
+.fact-table th:nth-child(1) {
+  width: 12%;
+}
+
+.fact-table th:nth-child(2) {
+  width: 42%;
+}
+
+.fact-table th:nth-child(3) {
+  width: 12%;
+}
+
+.fact-table th:nth-child(4) {
+  width: 12%;
+}
+
+.fact-table th:nth-child(5) {
+  width: 10%;
+}
+
+.fact-table th:nth-child(6) {
+  width: 12%;
+}
+
+.archive-table th:nth-child(1) {
+  width: 15%;
+}
+
+.archive-table th:nth-child(2) {
+  width: 20%;
+}
+
+.archive-table th:nth-child(3) {
+  width: 65%;
+}
+
+.inspector {
+  position: sticky;
+  top: 12px;
+}
+
+.inspector h3 {
+  margin-top: 14px;
+}
+
+.list-row {
+  border-bottom: 1px solid var(--line);
+  padding: 10px 0;
+  display: grid;
+  gap: 4px;
+}
+
+.list-row span {
+  color: var(--muted);
+}
+
+.list-row.compact {
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.panel-subhead {
+  margin: 16px 0 6px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.panel-subhead:first-of-type {
+  margin-top: 8px;
+}
+
+.motive-divergence {
+  border-radius: 8px;
+  border: 1px solid #e6d3ae;
+  background: #fdf8ef;
+  color: var(--amber);
+  padding: 10px;
+  margin-bottom: 8px;
+}
+
+.tenant-warning {
+  border-radius: 8px;
+  border: 1px solid #e6d3ae;
+  background: #fdf8ef;
+  color: var(--amber);
+  padding: 12px 14px;
+  display: grid;
+  gap: 4px;
+}
+
+.tenant-warning span {
+  color: var(--ink);
+}
+
+pre {
+  white-space: pre-wrap;
+  max-height: 170px;
+  overflow: auto;
+  margin: 7px 0 0;
+  padding: 9px;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  background: #fbfcfc;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.form-grid .wide {
+  grid-column: 1 / -1;
+}
+
+.wide-panel {
+  grid-column: 1 / -1;
+}
+
+.prompt-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.prompt-preview {
+  max-height: 360px;
+}
+
+.run-summary {
+  margin-top: 12px;
+}
+
+.inline-input {
+  max-width: 260px;
+}
+
+.button-row {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.message {
+  color: var(--muted);
+}
+
+.subtle {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.integration-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.integration-labels span {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #cfe0ed;
+  border-radius: 7px;
+  background: #eef5fb;
+  color: var(--blue);
+  padding: 0 9px;
+  font-size: 12px;
+  font-weight: 680;
+}
+
+.prompt-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 14px;
+  align-items: start;
+}
+
+.prompt-editor-panel {
+  grid-row: span 2;
+}
+
+.prompt-editor-form {
+  display: grid;
+  gap: 12px;
+}
+
+.prompt-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.full-prompt-editor {
+  min-height: calc(100vh - 255px);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.prompt-side-panel {
+  min-height: 0;
+}
+
+.project-memory-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 14px;
+  align-items: start;
+}
+
+.project-memory-form {
+  display: grid;
+  gap: 14px;
+}
+
+.project-memory-form fieldset {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 10px;
+}
+
+.project-memory-form legend {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  padding: 0 5px;
+}
+
+.type-toggle-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.checkbox-row {
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 8px;
+  background: var(--surface-alt);
+}
+
+.checkbox-row input {
+  width: auto;
+  height: auto;
+}
+
+.checkbox-row span {
+  color: var(--ink);
+  text-transform: none;
+}
+
+.policy-number-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.link-button {
+  border: 0;
+  background: transparent;
+  color: var(--blue);
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.dreaming-run-panel {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(170px, 220px) minmax(220px, 280px) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.run-policy-note {
+  grid-column: 1 / -1;
+}
+
+.status-log {
+  display: grid;
+  gap: 8px;
+}
+
+.log-entry {
+  display: grid;
+  grid-template-columns: 190px 90px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.log-entry span {
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+}
+
+.log-entry strong {
+  color: var(--blue);
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.log-entry p {
+  margin: 0;
+}
+
+.snippet {
+  display: grid;
+  gap: 8px;
+}
+
+.snippet + .snippet {
+  margin-top: 16px;
+}
+
+.empty-state,
+.loading,
+.error-banner {
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  padding: 14px;
+}
+
+.error-banner {
+  margin: 14px 22px 0;
+  color: var(--red);
+  border-color: #efc9cf;
+  background: #fff6f7;
+}
+
+.loading {
+  margin: 14px 22px 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 1100px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+  }
+
+  .nav-list,
+  .toolbar,
+  .prompt-workspace,
+  .project-memory-grid,
+  .type-toggle-grid,
+  .policy-number-grid,
+  .prompt-controls,
+  .dreaming-run-panel,
+  .panel-grid,
+  .panel-grid.two,
+  .split-layout,
+  .metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar,
+  .status-strip {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .scope-picker select {
+    width: 100%;
+  }
+
+  .inspector {
+    position: static;
+  }
+}

@@ -1,0 +1,836 @@
+<title>Memotron as a Claude Code Plugin — Spike</title>
+<style>
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  :root {
+    --ink: #1b1e24;
+    --ink-soft: #4a4f58;
+    --ink-mute: #757b86;
+    --paper: #eef0ec;
+    --paper-raised: #f8f9f6;
+    --paper-sunk: #e3e6e0;
+    --line: rgba(27, 30, 36, 0.13);
+    --line-strong: rgba(27, 30, 36, 0.24);
+    --accent: #b56a2e;
+    --accent-soft: #e9d3bb;
+    --accent-ink: #6e3f19;
+    --verified: #3f7d70;
+    --verified-soft: #d3e6e1;
+    --risk: #a8402f;
+    --risk-soft: #f1d9d2;
+    --shadow: 0 1px 2px rgba(27, 30, 36, 0.06), 0 8px 24px -12px rgba(27, 30, 36, 0.18);
+    --display: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --body: ui-sans-serif, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #e8eae5;
+      --ink-soft: #b7bcb4;
+      --ink-mute: #868d86;
+      --paper: #14181f;
+      --paper-raised: #1b212b;
+      --paper-sunk: #0f1319;
+      --line: rgba(232, 234, 229, 0.14);
+      --line-strong: rgba(232, 234, 229, 0.26);
+      --accent: #e0954f;
+      --accent-soft: #4a3620;
+      --accent-ink: #f3c893;
+      --verified: #6ab5a5;
+      --verified-soft: #1e3934;
+      --risk: #d4816e;
+      --risk-soft: #3d221d;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px -14px rgba(0, 0, 0, 0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #e8eae5; --ink-soft: #b7bcb4; --ink-mute: #868d86;
+    --paper: #14181f; --paper-raised: #1b212b; --paper-sunk: #0f1319;
+    --line: rgba(232, 234, 229, 0.14); --line-strong: rgba(232, 234, 229, 0.26);
+    --accent: #e0954f; --accent-soft: #4a3620; --accent-ink: #f3c893;
+    --verified: #6ab5a5; --verified-soft: #1e3934;
+    --risk: #d4816e; --risk-soft: #3d221d;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px -14px rgba(0, 0, 0, 0.55);
+  }
+  :root[data-theme="light"] {
+    --ink: #1b1e24; --ink-soft: #4a4f58; --ink-mute: #757b86;
+    --paper: #eef0ec; --paper-raised: #f8f9f6; --paper-sunk: #e3e6e0;
+    --line: rgba(27, 30, 36, 0.13); --line-strong: rgba(27, 30, 36, 0.24);
+    --accent: #b56a2e; --accent-soft: #e9d3bb; --accent-ink: #6e3f19;
+    --verified: #3f7d70; --verified-soft: #d3e6e1;
+    --risk: #a8402f; --risk-soft: #f1d9d2;
+    --shadow: 0 1px 2px rgba(27, 30, 36, 0.06), 0 8px 24px -12px rgba(27, 30, 36, 0.18);
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--paper); }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration-color: var(--accent-soft); text-underline-offset: 3px; }
+  a:hover { text-decoration-thickness: 2px; }
+  a:focus-visible, button:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px;
+  }
+  code, .mono { font-family: var(--mono); font-size: 0.88em; }
+
+  .page {
+    display: grid;
+    grid-template-columns: minmax(0, 15rem) minmax(0, 44rem);
+    gap: 3.5rem;
+    max-width: 68rem;
+    margin: 0 auto;
+    padding: 3.5rem 1.5rem 6rem;
+    align-items: start;
+  }
+  @media (max-width: 880px) {
+    .page { grid-template-columns: 1fr; padding-top: 2rem; }
+    nav.toc { display: none; }
+  }
+
+  nav.toc {
+    position: sticky;
+    top: 2.5rem;
+    font-size: 0.82rem;
+  }
+  nav.toc .toc-label {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-mute);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--line); }
+  nav.toc li { margin: 0; }
+  nav.toc a {
+    display: block;
+    padding: 0.32rem 0 0.32rem 0.85rem;
+    margin-left: -1px;
+    border-left: 1px solid transparent;
+    color: var(--ink-soft);
+    text-decoration: none;
+  }
+  nav.toc a:hover { color: var(--ink); border-left-color: var(--line-strong); }
+
+  main { min-width: 0; }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    padding: 0.3em 0.7em;
+    border-radius: 3px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: clamp(1.9rem, 1.5rem + 1.6vw, 2.7rem);
+    line-height: 1.12;
+    margin: 0.6em 0 0.35em;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  .dek {
+    font-size: 1.15rem;
+    color: var(--ink-soft);
+    max-width: 40rem;
+    margin: 0 0 1.6rem;
+    text-wrap: balance;
+  }
+  .meta-line {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--ink-mute);
+    margin-bottom: 2.2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4em 1.2em;
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 1.5rem;
+    margin: 3rem 0 1rem;
+    padding-top: 0.4rem;
+    border-top: 1px solid var(--line);
+    letter-spacing: -0.005em;
+  }
+  section:first-of-type h2 { border-top: none; padding-top: 0; }
+  h3 {
+    font-family: var(--body);
+    font-weight: 700;
+    font-size: 1rem;
+    margin: 1.8rem 0 0.6rem;
+  }
+  p { margin: 0 0 1rem; max-width: 40rem; }
+  ul, ol { padding-left: 1.3rem; }
+  li { margin-bottom: 0.4rem; }
+  strong { font-weight: 700; }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+    gap: 0.9rem;
+    margin: 1.6rem 0 2.4rem;
+  }
+  .stat {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+  }
+  .stat .n {
+    font-family: var(--display);
+    font-size: 1.7rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  .stat .l {
+    font-size: 0.76rem;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.18em 0.55em;
+    border-radius: 999px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .pill.observed { background: var(--verified-soft); color: var(--verified); }
+  .pill.derived { background: var(--paper-sunk); color: var(--ink-soft); }
+  .pill.risk { background: var(--risk-soft); color: var(--risk); }
+
+  .callout {
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    background: var(--paper-raised);
+    border-radius: 4px;
+    padding: 1rem 1.2rem;
+    margin: 1.4rem 0;
+  }
+  .callout.risk-callout { border-left-color: var(--risk); }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout .head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+  }
+
+  .quote {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--line-strong);
+    padding-left: 1rem;
+    margin: 1rem 0;
+  }
+  .quote cite { display: block; font-family: var(--mono); font-style: normal; font-size: 0.75rem; color: var(--ink-mute); margin-top: 0.4rem; }
+
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.4rem 0 2rem;
+  }
+  @media (max-width: 620px) { .compare { grid-template-columns: 1fr; } }
+  .compare .card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.1rem 1.2rem;
+    background: var(--paper-raised);
+  }
+  .compare .card.now { opacity: 0.88; }
+  .compare .card.proposed { border-color: var(--accent-soft); box-shadow: var(--shadow); }
+  .compare h4 {
+    margin: 0 0 0.7rem;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-mute);
+  }
+  .compare ul { margin: 0; padding-left: 1.1rem; font-size: 0.94rem; }
+  .compare li { margin-bottom: 0.5rem; }
+
+  .table-wrap { overflow-x: auto; margin: 1.2rem 0 2rem; border: 1px solid var(--line); border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.88rem; min-width: 40rem; }
+  th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  thead th {
+    background: var(--paper-sunk);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-mute);
+    font-weight: 600;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td code { color: var(--ink-soft); }
+
+  pre {
+    background: var(--paper-sunk);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+  pre code { font-size: 1em; color: var(--ink); }
+  .filetree {
+    background: var(--paper-sunk);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.75;
+    overflow-x: auto;
+    white-space: pre;
+    margin: 1.2rem 0 2rem;
+  }
+  .filetree .dir { color: var(--accent-ink); font-weight: 600; }
+  .filetree .note { color: var(--ink-mute); }
+  @media (prefers-color-scheme: dark) {
+    .filetree .dir { color: var(--accent); }
+  }
+  :root[data-theme="dark"] .filetree .dir { color: var(--accent); }
+  :root[data-theme="light"] .filetree .dir { color: var(--accent-ink); }
+
+  .transcript {
+    background: var(--paper-sunk);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.9rem 1.1rem;
+    margin: 1rem 0 1.6rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+  .transcript .cmd::before { content: "$ "; color: var(--ink-mute); }
+  .transcript .cmd { color: var(--ink); display: block; margin-top: 0.6rem; }
+  .transcript .cmd:first-child { margin-top: 0; }
+  .transcript .out { color: var(--ink-soft); white-space: pre-wrap; }
+  .transcript .ok { color: var(--verified); }
+  .transcript .fail { color: var(--risk); }
+
+  ol.steps { list-style: none; padding: 0; counter-reset: step; }
+  ol.steps li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 2.3rem;
+    margin-bottom: 0.9rem;
+  }
+  ol.steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0; top: 0.05em;
+    width: 1.5rem; height: 1.5rem;
+    border-radius: 50%;
+    background: var(--paper-sunk);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .footer-note {
+    margin-top: 3.5rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.82rem;
+    color: var(--ink-mute);
+  }
+
+  figure.diagram {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1.4rem 0 0.5rem;
+    overflow-x: auto;
+  }
+  figure.diagram svg { display: block; height: auto; }
+  figure.diagram figcaption {
+    margin: 0 0 2rem;
+    font-size: 0.78rem;
+    color: var(--ink-mute);
+    text-align: center;
+  }
+  .dg-box { fill: var(--paper-raised); stroke: var(--line-strong); stroke-width: 1.25; }
+  .dg-box-accent { fill: var(--paper-raised); stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 5 4; }
+  .dg-line { stroke: var(--ink-mute); stroke-width: 1.5; fill: none; }
+  .dg-title { font-family: var(--body); font-weight: 700; font-size: 13px; fill: var(--ink); }
+  .dg-sub { font-family: var(--body); font-size: 11px; fill: var(--ink-soft); }
+  .dg-label { font-family: var(--mono); font-size: 10.5px; fill: var(--ink-mute); }
+  .dg-eyebrow {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.04em;
+    text-transform: uppercase; fill: var(--accent-ink);
+  }
+</style>
+
+<div class="page">
+  <nav class="toc" aria-label="Table of contents">
+    <span class="toc-label">Contents</span>
+    <ol>
+      <li><a href="#context">Context</a></li>
+      <li><a href="#today-vs-plugin">Today vs. plugin</a></li>
+      <li><a href="#architecture">Dream Engine architecture</a></li>
+      <li><a href="#mapping">Component mapping</a></li>
+      <li><a href="#dreaming-hook">The dreaming hook</a></li>
+      <li><a href="#scaffold">Scaffold built this session</a></li>
+      <li><a href="#risks">Risks &amp; open questions</a></li>
+      <li><a href="#next-steps">Recommended next steps</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <span class="eyebrow">Spike · Research</span>
+    <h1>Memotron as a Claude&nbsp;Code plugin</h1>
+    <p class="dek">
+      Every piece this spike asked about — an MCP connector, skills, and a hook for
+      &ldquo;dreaming&rdquo; — already exists in Memotron today. It's just distributed
+      by hand, one repository at a time. Packaging it as an installable Claude Code
+      plugin is mechanical restructuring, not new invention.
+    </p>
+    <p class="meta-line">
+      <span>jedai/memotron</span>
+      <span>2026-07-29</span>
+      <span>Scaffold: <code>docs/spikes/claude-plugin/marketplace/</code></span>
+    </p>
+
+    <div class="stat-row">
+      <div class="stat"><span class="n">1</span><span class="l">MCP server bundled</span></div>
+      <div class="stat"><span class="n">2</span><span class="l">Skills bundled</span></div>
+      <div class="stat"><span class="n">4</span><span class="l">Lifecycle hooks</span></div>
+      <div class="stat"><span class="n">~177</span><span class="l">Tok always‑on cost</span></div>
+    </div>
+    <p style="margin-top:-1.6rem; font-size:0.82rem; color:var(--ink-mute);">
+      Figures from <code>claude plugin details memotron-memory</code> against the scaffold below —
+      <span class="pill observed">observed</span>, not estimated.
+    </p>
+
+    <section id="context">
+      <h2>Context</h2>
+      <p>
+        Memotron is a typed, temporal, governed memory graph for coding agents — identity,
+        preference, requirement, directive, state, decision, incident, and theme facts, formed
+        and pruned by an offline <strong>Dream Engine</strong>. It already talks to Claude Code
+        today, but the integration is hand-installed per repository: <code>uv tool install
+        jedai-memotron</code>, then <code>memotron init</code>, which writes a project
+        <code>.mcp.json</code>, four <code>.claude/settings.json</code> hooks, an always-loaded
+        rule file, and a <code>/memotron-memory</code> skill
+        <span class="pill observed">observed</span> — see <code>src/memotron/adoption.py</code>.
+      </p>
+      <p>
+        The question behind this spike was whether that bundle could instead be one Claude Code
+        <strong>plugin</strong>: a single install unit combining the MCP connector, the skills,
+        and — the part that sounded like it might need inventing — a hook that drives
+        &ldquo;dreaming.&rdquo; It turns out dreaming is not a metaphor to build toward; it's
+        already the name of the thing. <code>src/memotron/dreaming.py</code> implements a
+        <code>DreamEngine</code> running <strong>Formation → Consolidation → Pruning</strong>
+        (and an opt-in <strong>Coherence</strong> pass) jobs, and it is already wired to fire from
+        Claude Code's own compaction lifecycle <span class="pill observed">observed</span>.
+      </p>
+    </section>
+
+    <section id="today-vs-plugin">
+      <h2>Today vs. plugin</h2>
+      <p>The four moving parts don't change. What changes is how they're delivered.</p>
+      <div class="compare">
+        <div class="card now">
+          <h4>Today — per repository</h4>
+          <ul>
+            <li><code>uv tool install jedai-memotron</code>, once per machine</li>
+            <li><code>cd repo &amp;&amp; memotron init</code>, once per repository</li>
+            <li>Writes land <em>into</em> the repo: <code>.mcp.json</code>, <code>.claude/settings.json</code>, <code>.claude/rules/</code>, <code>.claude/skills/</code></li>
+            <li>Restart Claude Code, approve the MCP server, per repository</li>
+            <li>Updating the integration means re-running <code>memotron init</code> everywhere</li>
+          </ul>
+        </div>
+        <div class="card proposed">
+          <h4>Proposed — one plugin</h4>
+          <ul>
+            <li><code>/plugin marketplace add jedai/memotron-plugins</code>, once per machine</li>
+            <li><code>/plugin install memotron-memory@jedai</code>, once per machine</li>
+            <li>Nothing is written into the working repo's own tree</li>
+            <li>MCP server, hooks, and skills auto-attach to every session, in every repo</li>
+            <li>Updating the integration is <code>/plugin update memotron-memory</code></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="architecture">
+      <h2>Dream Engine architecture</h2>
+      <p>
+        Simplified from <code>README.md</code>'s system diagram. Client-managed calls
+        (<code>add_memory</code>) materialize immediately; everything else — sessions,
+        episodes, ingested context — queues for the same offline Dream Engine, which forms,
+        consolidates, and prunes before writing to the property graph.
+      </p>
+      <figure class="diagram">
+        <svg viewBox="0 0 980 460" role="img" aria-labelledby="dg1-title" style="min-width:680px;width:100%">
+          <title id="dg1-title">Dream Engine architecture: Agent to Episode Queue to Dream Engine (Formation, Consolidation, Pruning) to Property Graph, with LLM Transport and Dream Agent supporting the Dream Engine, and a direct add_memory path and a return search path between Agent and Property Graph.</title>
+          <defs>
+            <marker id="dg1-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-mute)"></path>
+            </marker>
+          </defs>
+
+          <!-- top arc: Agent -> Property Graph (add_memory) -->
+          <path class="dg-line" marker-end="url(#dg1-arrow)"
+            d="M105,168 L105,26 L845,26 L845,168" />
+          <text class="dg-label" x="475" y="20" text-anchor="middle">add_memory — exact fact, materializes immediately</text>
+
+          <!-- main row arrows -->
+          <path class="dg-line" marker-end="url(#dg1-arrow)" d="M190,200 L228,200" />
+          <path class="dg-line" marker-end="url(#dg1-arrow)" d="M380,200 L418,200" />
+          <path class="dg-line" marker-end="url(#dg1-arrow)" d="M682,200 L758,200" />
+          <text class="dg-label" x="720" y="190" text-anchor="middle">writes</text>
+
+          <!-- bottom arc: Property Graph -> Agent (return) -->
+          <path class="dg-line" marker-end="url(#dg1-arrow)"
+            d="M845,232 L845,415 L105,415 L105,232" />
+          <text class="dg-label" x="475" y="435" text-anchor="middle">search · profile · evidence — reads only, never mutates truth</text>
+
+          <!-- Dream Engine outer -->
+          <rect class="dg-box-accent" x="420" y="50" width="260" height="260" rx="10"></rect>
+          <text class="dg-eyebrow" x="550" y="70" text-anchor="middle">Dream Engine — offline</text>
+
+          <rect class="dg-box" x="440" y="88" width="220" height="50" rx="6"></rect>
+          <text class="dg-title" x="550" y="108" text-anchor="middle">Formation</text>
+          <text class="dg-sub" x="550" y="124" text-anchor="middle">episodes → typed memories</text>
+          <path class="dg-line" marker-end="url(#dg1-arrow)" d="M550,138 L550,152" />
+
+          <rect class="dg-box" x="440" y="153" width="220" height="50" rx="6"></rect>
+          <text class="dg-title" x="550" y="173" text-anchor="middle">Consolidation</text>
+          <text class="dg-sub" x="550" y="189" text-anchor="middle">thematic clustering</text>
+          <path class="dg-line" marker-end="url(#dg1-arrow)" d="M550,203 L550,217" />
+
+          <rect class="dg-box" x="440" y="218" width="220" height="50" rx="6"></rect>
+          <text class="dg-title" x="550" y="238" text-anchor="middle">Pruning</text>
+          <text class="dg-sub" x="550" y="254" text-anchor="middle">expiry · confidence · soft cap</text>
+
+          <!-- connectors down to LLM Transport / Dream Agent -->
+          <path class="dg-line" marker-end="url(#dg1-arrow)" d="M480,312 L480,328" />
+          <text class="dg-label" x="480" y="305" text-anchor="middle">extract</text>
+          <path class="dg-line" marker-end="url(#dg1-arrow)" d="M640,312 L640,328" />
+          <text class="dg-label" x="640" y="305" text-anchor="middle">approve + audit</text>
+
+          <rect class="dg-box" x="420" y="330" width="120" height="50" rx="6"></rect>
+          <text class="dg-title" x="480" y="352" text-anchor="middle">LLM</text>
+          <text class="dg-sub" x="480" y="368" text-anchor="middle">Transport</text>
+
+          <rect class="dg-box" x="580" y="330" width="120" height="50" rx="6"></rect>
+          <text class="dg-title" x="640" y="352" text-anchor="middle">Dream</text>
+          <text class="dg-sub" x="640" y="368" text-anchor="middle">Agent</text>
+
+          <!-- endpoints -->
+          <rect class="dg-box" x="20" y="168" width="170" height="64" rx="8"></rect>
+          <text class="dg-title" x="105" y="196" text-anchor="middle">Agent /</text>
+          <text class="dg-title" x="105" y="213" text-anchor="middle">Claude Code</text>
+
+          <rect class="dg-box" x="230" y="168" width="150" height="64" rx="8"></rect>
+          <text class="dg-title" x="305" y="196" text-anchor="middle">Episode</text>
+          <text class="dg-title" x="305" y="213" text-anchor="middle">Queue</text>
+
+          <rect class="dg-box" x="760" y="168" width="170" height="64" rx="8"></rect>
+          <text class="dg-title" x="845" y="196" text-anchor="middle">Property</text>
+          <text class="dg-title" x="845" y="213" text-anchor="middle">Graph</text>
+        </svg>
+        <figcaption>Sessions, episodes, and ingested context all queue for the same offline Dream Engine before materializing into the Property Graph.</figcaption>
+      </figure>
+    </section>
+
+    <section id="mapping">
+      <h2>Component mapping</h2>
+      <p>
+        Field values below are carried over unchanged from the generator in
+        <code>adoption.py</code> <span class="pill observed">observed</span>, not reinvented —
+        the plugin scaffold reuses the same MCP server name, hook events, args, and timeouts.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Concept</th><th>Today (per repo)</th><th>Plugin (this spike)</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Manifest / identity</td>
+              <td><span class="mono">— none —</span></td>
+              <td><code>.claude-plugin/plugin.json</code></td>
+            </tr>
+            <tr>
+              <td>MCP connector</td>
+              <td><code>.mcp.json</code> → <code>memotron_agent_memory</code>, stdio, <code>command: "memotron"</code></td>
+              <td>Same server name/args, <code>command</code> routed through <code>bin/memotron-run</code> (resolves <code>${CLAUDE_PLUGIN_ROOT}</code>)</td>
+            </tr>
+            <tr>
+              <td>Hooks</td>
+              <td><code>.claude/settings.json</code> → SessionStart / PreCompact / PostCompact / SessionEnd, <code>memotron hook &lt;event&gt;</code></td>
+              <td><code>hooks/hooks.json</code>, identical four events, args, and timeouts (30s start, 60s compact/end)</td>
+            </tr>
+            <tr>
+              <td>Skills</td>
+              <td><code>.claude/skills/memotron-memory/SKILL.md</code> (generated), <code>.claude/skills/memotron-sdk/SKILL.md</code> (hand-authored)</td>
+              <td><code>skills/memotron-memory/</code>, <code>skills/memotron-sdk/</code> — invoked as <code>/memotron-memory:status</code> etc. (plugin-namespaced)</td>
+            </tr>
+            <tr>
+              <td>Always-loaded rule</td>
+              <td><code>.claude/rules/memotron.md</code>, injected every session</td>
+              <td>
+                <span class="pill derived">derived</span>
+                Likely redundant — <code>SessionStart</code>'s own stdout already repeats the same
+                guidance every session (see <code>cli.py:149-181</code>). No plugin equivalent of a
+                standing rule file was found in the docs pass; not yet proven end-to-end.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="dreaming-hook">
+      <h2>The dreaming hook</h2>
+      <p>
+        The one open design question going in was: <em>what fires dreaming?</em> The official
+        Claude Code hooks reference settles it directly:
+      </p>
+      <blockquote class="quote">
+        &ldquo;No idle detection or periodic triggering: Hook events fire only in response to
+        explicit user actions or Claude tool calls, never on a timer or idle state.&rdquo;
+        <cite>code.claude.com/docs/en/hooks — observed, fetched directly</cite>
+      </blockquote>
+      <p>
+        There is no cron-like hook to build toward, so the right design isn't a new mechanism —
+        it's the one Memotron already uses. <code>PreCompact</code> and <code>PostCompact</code>
+        each call <code>memotron hook &lt;event&gt;</code>, which runs
+        <code>platform.memory_refresh(include_project=true)</code>
+        <span class="pill observed">observed</span>, and that in turn executes any due
+        Formation/Consolidation/Pruning/Coherence jobs. Dreaming rides Claude Code's own
+        compaction and session boundaries instead of a background schedule — which also matches
+        the project's own &ldquo;no background daemon, no fixed port&rdquo; design goal.
+      </p>
+      <figure class="diagram">
+        <svg viewBox="0 0 940 210" role="img" aria-labelledby="dg2-title" style="min-width:760px;width:100%">
+          <title id="dg2-title">Hook lifecycle: SessionStart registers the caller and loads context, then after a gap of session activity, PreCompact logs the compaction boundary and runs due dreams, PostCompact stores the redacted summary and runs due dreams, and SessionEnd flushes curated memory.</title>
+          <defs>
+            <marker id="dg2-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-mute)"></path>
+            </marker>
+          </defs>
+
+          <path class="dg-line" marker-end="url(#dg2-arrow)" d="M210,65 L258,65" stroke-dasharray="3 4" />
+          <text class="dg-label" x="234" y="15" text-anchor="middle" font-style="italic">· · · session activity · · ·</text>
+
+          <path class="dg-line" marker-end="url(#dg2-arrow)" d="M450,65 L498,65" />
+          <path class="dg-line" marker-end="url(#dg2-arrow)" d="M690,65 L738,65" />
+
+          <!-- 4 hook stage cards -->
+          <g>
+            <rect class="dg-box-accent" x="20" y="30" width="190" height="70" rx="8"></rect>
+            <text class="dg-eyebrow" x="115" y="50" text-anchor="middle">SessionStart</text>
+            <text class="dg-sub" x="115" y="70" text-anchor="middle">register caller +</text>
+            <text class="dg-sub" x="115" y="86" text-anchor="middle">memory_start</text>
+          </g>
+
+          <g>
+            <rect class="dg-box-accent" x="260" y="30" width="190" height="70" rx="8"></rect>
+            <text class="dg-eyebrow" x="355" y="50" text-anchor="middle">PreCompact</text>
+            <text class="dg-sub" x="355" y="70" text-anchor="middle">log boundary +</text>
+            <text class="dg-sub" x="355" y="86" text-anchor="middle">run due dreams</text>
+          </g>
+
+          <g>
+            <rect class="dg-box-accent" x="500" y="30" width="190" height="70" rx="8"></rect>
+            <text class="dg-eyebrow" x="595" y="50" text-anchor="middle">PostCompact</text>
+            <text class="dg-sub" x="595" y="70" text-anchor="middle">store redacted summary +</text>
+            <text class="dg-sub" x="595" y="86" text-anchor="middle">run due dreams</text>
+          </g>
+
+          <g>
+            <rect class="dg-box-accent" x="740" y="30" width="190" height="70" rx="8"></rect>
+            <text class="dg-eyebrow" x="835" y="50" text-anchor="middle">SessionEnd</text>
+            <text class="dg-sub" x="835" y="70" text-anchor="middle">flush curated</text>
+            <text class="dg-sub" x="835" y="86" text-anchor="middle">memory</text>
+          </g>
+
+          <!-- lower lane: what the Dream Engine actually runs -->
+          <path class="dg-line" d="M355,100 L355,130" stroke-dasharray="2 3" marker-end="url(#dg2-arrow)"></path>
+          <path class="dg-line" d="M595,100 L595,130" stroke-dasharray="2 3" marker-end="url(#dg2-arrow)"></path>
+          <rect class="dg-box" x="345" y="132" width="260" height="48" rx="6"></rect>
+          <text class="dg-title" x="475" y="152" text-anchor="middle" style="font-size:12px">Dream Engine</text>
+          <text class="dg-sub" x="475" y="168" text-anchor="middle">Formation · Consolidation · Pruning</text>
+        </svg>
+        <figcaption>The four moments Claude Code hooks fire; only PreCompact and PostCompact actually invoke the Dream Engine.</figcaption>
+      </figure>
+      <div class="callout">
+        <div class="head"><span class="pill derived">stretch / unconfirmed</span> Monitors as a session-lifetime nudge</div>
+        <p>
+          Plugins can declare experimental <code>monitors/monitors.json</code> — a persistent
+          shell command whose stdout lines surface as notifications for the life of a session.
+          A polling script could emit &ldquo;dream cycle due&rdquo; during a long-lived session.
+          This is not background/cron — it only runs while a session is open — and its config
+          shape wasn't verified against a working example in this pass. Worth a follow-up spike,
+          not part of the recommended design.
+        </p>
+      </div>
+    </section>
+
+    <section id="scaffold">
+      <h2>Scaffold built this session</h2>
+      <p>
+        A working plugin + local test marketplace, built to the mapping above and validated with
+        the real <code>claude plugin</code> CLI (not just hand-inspected JSON).
+      </p>
+      <div class="filetree">docs/spikes/claude-plugin/
+├── memotron-plugin-spike.html          <span class="note"># this report</span>
+└── <span class="dir">marketplace/</span>
+    ├── <span class="dir">.claude-plugin/</span>
+    │   └── marketplace.json               <span class="note"># one entry: memotron-memory</span>
+    └── <span class="dir">memotron-memory/</span>
+        ├── <span class="dir">.claude-plugin/</span>
+        │   └── plugin.json
+        ├── .mcp.json                       <span class="note"># memotron_agent_memory, stdio</span>
+        ├── <span class="dir">hooks/</span>
+        │   └── hooks.json                  <span class="note"># SessionStart/PreCompact/PostCompact/SessionEnd</span>
+        ├── <span class="dir">bin/</span>
+        │   └── memotron-run             <span class="note"># PATH-or-uv resolver shim, executable</span>
+        └── <span class="dir">skills/</span>
+            ├── memotron-memory/SKILL.md
+            └── memotron-sdk/SKILL.md</div>
+
+      <h3>Verification transcript</h3>
+      <div class="transcript">
+<span class="cmd">python3 -m json.tool marketplace.json plugin.json .mcp.json hooks.json</span>
+<span class="out ok">OK · OK · OK · OK  (all four manifests are valid JSON)</span>
+
+<span class="cmd">claude plugin validate docs/spikes/claude-plugin/marketplace</span>
+<span class="out ok">✔ Validation passed</span>
+
+<span class="cmd">claude --plugin-dir .../memotron-memory plugin details memotron-memory</span>
+<span class="out ok">Skills (2)  memotron-memory, memotron-sdk
+Hooks (4)   SessionStart, PreCompact, PostCompact, SessionEnd
+MCP servers (1)  memotron_agent_memory
+Always-on:  ~177 tok added to every session</span></div>
+      <p>
+        <span class="pill observed">observed</span> The <code>--plugin-dir</code> session-scoped
+        load (rather than mutating the global marketplace/plugin registry) confirms the plugin
+        is structurally correct and loadable, independent of the JSON validator alone.
+      </p>
+    </section>
+
+    <section id="risks">
+      <h2>Risks &amp; open questions</h2>
+
+      <div class="callout risk-callout">
+        <div class="head"><span class="pill risk">confirmed risk</span> Distribution bootstrap</div>
+        <p>
+          A plugin can't assume <code>uv tool install jedai-memotron</code> already happened.
+          The scaffold's <code>bin/memotron-run</code> shim falls back to
+          <code>uv tool run --from jedai-memotron memotron …</code>, which downloads and runs
+          the package on first use with no separate install step — <em>if</em> the package
+          resolves from wherever <code>uv</code> looks. It did not, in this environment:
+        </p>
+        <div class="transcript">
+<span class="cmd">bash bin/memotron-run --help</span>
+<span class="out fail">× No solution found when resolving tool dependencies:
+  ╰─▶ Because jedai-memotron was not found in the package registry ...</span></div>
+        <p>
+          <code>jedai-memotron</code> isn't on a registry <code>uv</code> can reach from this
+          machine. Inside this repo's own checkout, <code>uv run memotron --help</code> works
+          fine — but that only helps someone developing Memotron itself, not a consumer
+          repository installing the plugin. <strong>Fix before shipping</strong>: publish
+          <code>jedai-memotron</code> to an internal index <code>uv</code> is configured to
+          check, or ship a vendored/pre-built binary in <code>bin/</code> instead of relying on
+          first-run resolution.
+        </p>
+      </div>
+
+      <div class="callout">
+        <div class="head"><span class="pill observed">confirmed by docs</span> No idle/timer hooks</div>
+        <p>
+          Already covered above — restated here because it constrains the design, not just
+          informs it. Any future &ldquo;dream more proactively&rdquo; feature has to ride an
+          existing event (tool call, compaction, session boundary), not a clock.
+        </p>
+      </div>
+
+      <div class="callout">
+        <div class="head"><span class="pill derived">scope</span> Spike, not production packaging</div>
+        <p>
+          This scaffold hasn't been round-tripped through a real
+          <code>/plugin marketplace add</code> + <code>/plugin install</code> + <code>/reload-plugins</code>
+          flow — only the CLI's non-interactive <code>validate</code> and <code>details</code>
+          commands, deliberately, to avoid mutating this machine's global plugin registry. One
+          marketplace with one plugin is the minimum shape for local testing; shipping this
+          org-wide would more likely mean a shared internal marketplace repo alongside other
+          jedai plugins.
+        </p>
+      </div>
+    </section>
+
+    <section id="next-steps">
+      <h2>Recommended next steps</h2>
+      <ol class="steps">
+        <li>Resolve the bootstrap risk first — it blocks everything downstream. Publish
+          <code>jedai-memotron</code> somewhere <code>uv tool run</code> can reach, or replace
+          the shim with a vendored binary.</li>
+        <li>Run the real interactive flow once resolved: <code>/plugin marketplace add</code> →
+          <code>/plugin install</code> → <code>/reload-plugins</code> → confirm
+          <code>memotron_agent_memory</code> tools actually answer calls, not just that the
+          server is declared.</li>
+        <li>Decide whether the always-loaded rule file is worth replicating in plugin form, or
+          whether <code>SessionStart</code>'s own injected context genuinely replaces it — test
+          with a multi-session transcript before deciding.</li>
+        <li>Pick a home for the real marketplace repo (a new <code>jedai/claude-plugins</code>
+          repo, most likely) rather than nesting it under this spike's <code>docs/</code> folder
+          long-term.</li>
+        <li>If proactive (non-hook-driven) dreaming is ever wanted, prototype the experimental
+          Monitors mechanism as its own follow-up spike — don't fold it into this one.</li>
+      </ol>
+    </section>
+
+    <p class="footer-note">
+      Spike research only — nothing in <code>docs/spikes/claude-plugin/</code> is wired into this
+      repository's real Claude Code integration. Sources: direct reads of
+      <code>src/memotron/{cli,adoption,agent_memory_mcp,dreaming}.py</code> and
+      <code>README.md</code>; official docs fetched from <code>code.claude.com/docs/en/{plugins,plugins-reference,plugin-marketplaces,hooks}</code>;
+      scaffold validated with the local <code>claude</code> CLI, transcripts above.
+    </p>
+  </main>
+</div>

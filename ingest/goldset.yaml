@@ -1,0 +1,198 @@
+# Three-band gold set for the JedAI portal KB pilot (INGEST.md §7 Phase 2).
+#
+# Every question and every expected answer below was derived by READING the pilot
+# MDX, not invented. Each entry cites the source file and the literal line that
+# grounds it, so a reviewer can re-verify without trusting this file.
+#
+# Bands (INGEST.md §7 Phase 2):
+#   band1_single_fact  -- parity with document search is the pass bar
+#   band2_cross_page   -- pass = correct multi-page answer with >=1 origin-attributed
+#                         expansion result, at a fraction of stuffing tokens
+#   band3_temporal     -- pass = current answer + correct as_of historical answer
+#
+# Field contract:
+#   id            stable key
+#   question      the natural-language query handed to search()
+#   expect_any    answer is FOUND if any of these strings appears in a returned
+#                 fact (case-insensitive, whitespace-normalized)
+#   expect_slugs  slugs the evidence SHOULD come from (evidence precision)
+#   source        file:line the answer was read from
+#   min_slugs     band2 only: distinct evidence slugs required to call it a join
+#   require_expansion  band2 only: require >=1 result with a non-direct origin
+
+band1_single_fact:
+  - id: b1-01
+    question: Which team provides the Special Offers source feed?
+    expect_any: ["GCX", "Guest Content eXperience"]
+    expect_slugs: ["/platform/knowledgebase/sources/dscribe/special-offers/"]
+    source: "sources/dscribe/special-offers.mdx:18-20 -- '**Source team**: GCX'"
+
+  - id: b1-02
+    question: What is the D-Scribe path for Special Offers content?
+    expect_any: ["/content/preview/{locale}/{slug}/MarketingOffers/", "MarketingOffers"]
+    expect_slugs: ["/platform/knowledgebase/sources/dscribe/special-offers/"]
+    source: "sources/dscribe/special-offers.mdx:23 -- '**D-Scribe Path**: `/content/preview/{locale}/{slug}/MarketingOffers/`'"
+
+  - id: b1-03
+    question: What is the Vertex data store for Special Offers at Disneyland Resort?
+    expect_any: ["kb_ds_source_dscribe_special_offers_dlr_en_us_v1"]
+    expect_slugs: ["/platform/knowledgebase/sources/dscribe/special-offers/"]
+    source: "sources/dscribe/special-offers.mdx:34 -- Disneyland Resort | disneyland | dlr | kb_ds_source_dscribe_special_offers_dlr_en_us_v1"
+
+  - id: b1-04
+    question: What is the update frequency of the Special Offers feed?
+    expect_any: ["Event-Driven", "Event Driven"]
+    expect_slugs: ["/platform/knowledgebase/sources/dscribe/special-offers/"]
+    source: "sources/dscribe/special-offers.mdx:22 -- '**Update frequency**: Event-Driven'"
+
+  - id: b1-05
+    question: Which Vertex data store backs planDisney Pocket Guides for Walt Disney World?
+    expect_any: ["kb_ds_source_plandisney_pocket_guides_wdw_en_us_v1"]
+    expect_slugs: ["/platform/knowledgebase/sources/plandisney/pocket-guides/"]
+    source: "sources/plandisney/pocket-guides.mdx -- Walt Disney World | wdw | kb_ds_source_plandisney_pocket_guides_wdw_en_us_v1"
+
+  - id: b1-06
+    question: What is D-Scribe?
+    expect_any: ["web content management system", "content management system"]
+    expect_slugs: ["/platform/knowledgebase/sources/dscribe/"]
+    source: "sources/dscribe/index.mdx:9 -- 'D-Scribe is the web content management system used at Disney'"
+
+  - id: b1-07
+    question: What was decided about CockroachDB as a PostgreSQL substitute?
+    expect_any: ["non-starter", "non starter"]
+    expect_slugs: ["/solution_engineering/platform-decision-log/approved/"]
+    source: "platform-decision-log/approved.mdx:94 -- 'CockroachDB is a **non-starter** for this use case.'"
+
+  - id: b1-08
+    question: What is the team budget hard cap on the Jedai Gateway?
+    expect_any: ["$500", "500"]
+    expect_slugs: ["/products/jedai-gateway/"]
+    source: "products/jedai-gateway/index.mdx -- '$500 hard cap, $250 soft budget alert'"
+
+  - id: b1-09
+    question: What availability target applies to the production environment?
+    expect_any: ["99.99", "four 9s", "four nines"]
+    expect_slugs: ["/solution_engineering/platform-decision-log/approved/"]
+    source: "platform-decision-log/approved.mdx:37 -- 'production | 99.99% | 6h'"
+
+  - id: b1-10
+    question: What feed format does the Special Offers source deliver?
+    expect_any: ["Markdown with JSON Metadata", "Markdown with JSON"]
+    expect_slugs: ["/platform/knowledgebase/sources/dscribe/special-offers/"]
+    source: "sources/dscribe/special-offers.mdx:21 -- '**Feed format**: Markdown with JSON Metadata'"
+
+  - id: b1-11
+    question: How does the Jedai Gateway authenticate traffic?
+    expect_any: ["virtual key", "virtual keys"]
+    expect_slugs: ["/products/jedai-gateway/"]
+    source: "products/jedai-gateway/index.mdx:137 -- 'The gateway authenticates all traffic via virtual keys.'"
+
+  - id: b1-12
+    question: What was decided about SCIM integration for LiteLLM?
+    expect_any: ["Disengage SCIM", "disengage"]
+    expect_slugs: ["/solution_engineering/platform-decision-log/approved/"]
+    source: "platform-decision-log/approved.mdx:136-142 -- 'D008: Disengage SCIM Integration for LiteLLM'"
+
+band2_cross_page:
+  - id: b2-01
+    question: Which Vertex data stores back DLR special offers and what pipeline populates them?
+    expect_any: ["kb_ds_source_dscribe_special_offers_dlr_en_us_v1"]
+    expect_slugs:
+      - "/platform/knowledgebase/sources/dscribe/special-offers/"
+      - "/platform/knowledgebase/sources/"
+      - "/platform/knowledgebase/sources/dscribe/"
+    min_slugs: 2
+    require_expansion: true
+    source: "INGEST.md G3-1 verbatim; grounded in special-offers.mdx:34 + sources/index.mdx 'How Sources Work'"
+
+  - id: b2-02
+    question: Which team maintains D-Scribe and which content feeds does it provide?
+    expect_any: ["GCX", "Guest Content eXperience"]
+    expect_slugs:
+      - "/platform/knowledgebase/sources/dscribe/"
+      - "/platform/knowledgebase/sources/dscribe/special-offers/"
+    min_slugs: 2
+    require_expansion: true
+    source: "sources/dscribe/index.mdx:9 (GCX maintains) + index.mdx:17-27 (Available Feeds) + special-offers.mdx:20"
+
+  - id: b2-03
+    question: How does content from a source get indexed into the Jedai Knowledge Base?
+    expect_any: ["Chunks and embeds", "embeds", "vector", "index"]
+    expect_slugs:
+      - "/platform/knowledgebase/sources/"
+      - "/platform/knowledgebase/sources/dscribe/special-offers/"
+    min_slugs: 2
+    require_expansion: true
+    source: "sources/index.mdx 'How Sources Work' 4-step pipeline + special-offers.mdx:14"
+
+  - id: b2-04
+    question: Which knowledge base sources update on an event-driven cadence?
+    expect_any: ["Event-Driven", "Event Driven"]
+    expect_slugs:
+      - "/platform/knowledgebase/sources/dscribe/special-offers/"
+      - "/platform/knowledgebase/sources/plandisney/pocket-guides/"
+    min_slugs: 2
+    require_expansion: false
+    source: "special-offers.mdx:22 + pocket-guides.mdx 'Update frequency: Event-Driven' -- two different pages"
+
+  - id: b2-05
+    question: What does the Jedai Gateway manage and how is team access controlled?
+    expect_any: ["virtual key", "virtual keys", "allowlist", "least-privilege"]
+    expect_slugs: ["/products/jedai-gateway/"]
+    min_slugs: 1
+    require_expansion: true
+    source: "products/jedai-gateway/index.mdx 'What the Gateway Manages' + 'Centralized Controls'"
+
+  - id: b2-06
+    question: Which decisions concern LiteLLM and what did they establish?
+    expect_any: ["PostgreSQL", "stable API", "feature flag", "SCIM"]
+    expect_slugs: ["/solution_engineering/platform-decision-log/approved/"]
+    min_slugs: 1
+    require_expansion: true
+    source: "platform-decision-log/approved.mdx D008/D009/D010 -- three separate H3 sections"
+
+# The paraphrase probe from INGEST.md §5a (measured 0.168 trigram cosine against
+# the special-offers vocabulary). Under the hermetic transport this is expected to
+# FAIL; under text-embedding-3 it is the T18 before/after evidence. Reported as a
+# measurement, never a gate.
+band2_paraphrase_probe:
+  - id: b2-p1
+    question: How do promotional discounts flow into the knowledgebase?
+    expect_any: ["special offer", "Special Offers", "GCX", "kb_ds_source_dscribe_special_offers"]
+    expect_slugs: ["/platform/knowledgebase/sources/dscribe/special-offers/"]
+    min_slugs: 1
+    require_expansion: false
+    source: "INGEST.md §5a paraphrase probe, verbatim"
+
+  - id: b2-p2
+    question: Where does vacation deal content come from before guests see it?
+    expect_any: ["GCX", "D-Scribe", "Special Offers"]
+    expect_slugs: ["/platform/knowledgebase/sources/dscribe/special-offers/"]
+    min_slugs: 1
+    require_expansion: false
+    source: "Second paraphrase probe over special-offers.mdx:12-18, zero shared vocabulary"
+
+# Band 3 runs against the simulated edit-and-resync performed by verify_goals.py
+# (G3-3). The portal checkout is NEVER modified: the edit is applied to the
+# section text in memory and re-ingested under the same custom_id with a later
+# reference_time, which is exactly what a real doc commit would produce.
+band3_temporal:
+  - id: b3-01
+    question: What is the current availability target for the integration environment?
+    edit:
+      custom_id: "/solution_engineering/platform-decision-log/approved/#d001-standard-platform-classes"
+      find: "| integration | 99.5% | 6h |"
+      replace: "| integration | 99.99% | 6h |"
+    expect_before_any: ["99.5"]
+    expect_after_any: ["99.99"]
+    source: "platform-decision-log/approved.mdx:36 -- 'integration | 99.5% | 6h'"
+
+  - id: b3-02
+    question: What is the decided status of CockroachDB for the Jedai platform?
+    edit:
+      custom_id: "/solution_engineering/platform-decision-log/approved/#d005-cockroachdb-viability-as-postgresql-substitute"
+      find: "CockroachDB is a **non-starter** for this use case."
+      replace: "CockroachDB is **approved** for this use case as of the 2026 re-review."
+    expect_before_any: ["non-starter", "non starter"]
+    expect_after_any: ["approved"]
+    source: "platform-decision-log/approved.mdx:94"

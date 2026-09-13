@@ -1,0 +1,20 @@
+diff --git a/src/memotron/storage/sqlite.py b/src/memotron/storage/sqlite.py
+index d3a174d..2849dde 100644
+--- a/src/memotron/storage/sqlite.py
++++ b/src/memotron/storage/sqlite.py
+@@ -1064,7 +1064,14 @@ class SQLiteStorageBackend(StorageBackend):
+             """,
+             (scope_key, *materialized, *materialized),
+         ).fetchall()
+-        return [self._row_to_relationship(row) for row in rows]
++        # T0-10: the entity-hop frontier must honour the SAME active-epoch ancestry that
++        # relationships_for_scope applies, or rows outside the ancestry re-enter retrieval
++        # through an expansion hop -- which is how a rolled-back epoch's memory keeps being
++        # served after redream_rollback, and how migrated rows carrying a foreign epoch_id
++        # surface from search() while profile() denies they exist.
++        ancestry = self._active_epoch_ancestry(scope_key)
++        relationships = [self._row_to_relationship(row) for row in rows]
++        return [r for r in relationships if self._epoch_visible(r, ancestry=ancestry)]
+ 
+     def find_active_truth_relationships(self, truth_key: str) -> list[GraphRelationship]:
+         normalized_truth_key = normalize_key(truth_key)

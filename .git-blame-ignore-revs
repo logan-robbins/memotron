@@ -1,0 +1,13 @@
+# Revisions to skip in `git blame`.
+#
+# Enable it for this repo once, per clone:
+#
+#     git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# GitHub honours this file automatically. Only ever add commits that are provably
+# whitespace-only -- verified with `scripts/verify/ast_identity.py`, which compares
+# the parsed tree rather than the text.
+
+# style: run ruff format across the repo (243 files, mechanical)
+# ast_identity: 147/147 modules parse to a byte-identical tree.
+e50d0f37563d39ca478fddb355bcc73844f759aa
