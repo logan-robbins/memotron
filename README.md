@@ -1272,9 +1272,34 @@ memory, so the server and the demo cannot disagree about what a node looks like.
 | `memory_replay(scope)` | the proof: both digests, whether they are equal, and the event count |
 
 `examples/caveman_mcp_server.py` is the entry point (Streamable HTTP at `/mcp`, `/health`,
-`MCP_PORT` default 8020). `memory_read`, `memory_ingest` and `memory_dream` reach the JedAI
+`MCP_PORT` default 8020). `main()` loads the repo-root gitignored `.env` first, never overriding
+the process environment. `memory_read`, `memory_ingest` and `memory_dream` reach the JedAI
 Gateway; with `LITELLM_API_KEY` unset each returns one line naming the variable. That is a
 precondition, not an offline mode.
+
+#### Codex CLI wiring (local only)
+
+The server is a long-lived local process and Codex dials it over streamable HTTP; nothing under
+`.claude/`, `.mcp.json` or `.memotron.yaml` is involved, so the Claude Code wiring is unchanged.
+
+```bash
+nohup uv run --no-sync examples/caveman_mcp_server.py > .memotron-caveman-mcp.log 2>&1 &
+curl -s http://127.0.0.1:8020/health                       # ok
+codex mcp add caveman-memory --url http://127.0.0.1:8020/mcp
+```
+
+Then, in `~/.codex/config.toml` under `[mcp_servers.caveman-memory]`, set `tool_timeout_sec = 600`
+(ingest and dream outlive Codex's 60 s default) and `default_tools_approval_mode = "approve"` (the
+tools carry no `readOnlyHint` annotation, so Codex otherwise asks before every call and `codex exec`,
+whose approval policy is `never`, refuses them outright), and copy
+`src/memotron/caveman/guidance/SKILL.md` to `~/.codex/skills/caveman-memory/SKILL.md`, so
+`$caveman-memory brief|read|node|neighbors|explain|ingest|dream|replay` routes the same verbs the
+Claude Code skill does. `codex mcp get caveman-memory` shows the table; `memory_contract` returns
+the full contract in-session.
+
+The graph is in memory by design (a bounded compression of the ledger), so restarting this process
+starts `memory_brief` from empty while `.memotron/caveman.sqlite` keeps every claim and every
+journalled event. Keep the process up for the length of an experiment.
 
 The guidance an agent reads ships **as package data** in `src/memotron/caveman/guidance/`:
 `AGENTS.md` (what the memory is, the lifecycle, every tool, the rendering format, what `[n-001]`

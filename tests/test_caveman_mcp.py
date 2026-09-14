@@ -960,6 +960,29 @@ async def test_health_answers_outside_the_mcp_middleware() -> None:
     assert response.body == b"ok"
 
 
+def test_build_runtime_from_env_creates_the_ledger_directory(
+    tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A fresh checkout has no ``.memotron/``; the composition root makes it.
+
+    ``sqlite3.connect`` answers a missing directory with "unable to open database
+    file", and because the runtime is built lazily that surfaced on the first tool
+    call of a freshly cloned server rather than at startup. The directory is the
+    composition root's to create because the composition root chose the path.
+    No credential is needed to build: the transports resolve the key at call time.
+    """
+    target = tmp_path / "fresh" / "nested" / "caveman.sqlite"
+    monkeypatch.setenv(caveman_mcp.LEDGER_PATH_ENV, str(target))
+    monkeypatch.delenv(GATEWAY_API_KEY_ENV, raising=False)
+    assert not target.parent.exists()
+
+    built = caveman_mcp.build_runtime_from_env()
+
+    assert target.parent.is_dir()
+    assert target.is_file()
+    assert built.ledger.entry_counts(scope="anything") == {}
+
+
 ENTRY_POINT = REPO_ROOT / "examples" / "caveman_mcp_server.py"
 
 
@@ -975,6 +998,21 @@ def test_the_entry_point_serves_through_the_one_supported_path() -> None:
     assert "mcp_bind_from_env(" in source
     assert "mcp.run(" not in source
     assert "mcp.settings" not in source
+
+
+def test_the_entry_point_loads_the_repo_root_env_file_before_serving() -> None:
+    """``main()`` loads the checkout's own ``.env`` through ``runtime.load_env_file``.
+
+    Anchored to the entry point's file, not to the cwd (T1-14), and before the
+    bind: an MCP client that launches or dials this server without exporting the
+    gateway key -- Codex, Claude, a ``nohup`` from elsewhere -- reaches the same
+    gateway the demo does. ``load_env_file`` never overrides a value already in
+    the environment, so an exported key still wins.
+    """
+    source = ENTRY_POINT.read_text(encoding="utf-8")
+    assert "REPO_ROOT = Path(__file__).resolve().parents[1]" in source
+    assert 'load_env_file(REPO_ROOT / ".env")' in source
+    assert source.index('load_env_file(REPO_ROOT / ".env")') < source.index("mcp_bind_from_env(default_host")
 
 
 def test_the_entry_point_documents_every_variable_it_serves() -> None:

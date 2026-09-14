@@ -82,6 +82,7 @@ import json
 import os
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from fastmcp import FastMCP
@@ -205,7 +206,11 @@ def build_runtime_from_env() -> CavemanRuntime:
     Six seams, all concrete, one arrangement:
 
     * the ledger is sqlite at :data:`LEDGER_PATH_ENV` (both streams, claims and
-      events);
+      events); its parent directory is created here if absent, because the
+      default lives under a gitignored ``.memotron/`` that a fresh checkout does
+      not have, and ``sqlite3.connect`` answers a missing directory with the
+      unhelpful "unable to open database file" -- on the FIRST tool call, not at
+      startup, since construction is lazy;
     * the graph is a plain ``InMemoryGraph``; ``CavemanMemory`` wraps it in
       ``JournaledGraph`` itself, and ``memory.graph`` is that wrapper -- so every
       mutation is journalled, and journalled exactly once;
@@ -224,7 +229,9 @@ def build_runtime_from_env() -> CavemanRuntime:
     motive = MOTIVES[motive_name]()
 
     clock = UtcClock()
-    ledger = CavemanLedger(os.environ.get(LEDGER_PATH_ENV, DEFAULT_LEDGER_PATH))
+    ledger_path = os.environ.get(LEDGER_PATH_ENV, DEFAULT_LEDGER_PATH)
+    Path(ledger_path).parent.mkdir(parents=True, exist_ok=True)
+    ledger = CavemanLedger(ledger_path)
     receipts = InMemoryReceipts()
     base_url = os.environ.get(GATEWAY_BASE_URL_ENV, DEFAULT_GATEWAY_BASE_URL)
     chat = CavemanChatTransport(
